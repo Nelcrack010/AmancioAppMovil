@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar } from 'react-native';
-import ViajesView from './src/views/ViajesView';
+import ViajesView from './src/views/ViajesView.jsx';
 import ApiService from './src/services/api/apiService';
 import { API_CONFIG } from './src/config/constants';
 
