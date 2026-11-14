@@ -2,13 +2,13 @@ import React from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Texto from './Texto';
-import Tarjeta from './Tarjeta';
+import { ItemLista } from './Lista';
 import { avisar } from '../utils/dialogos';
 import { formatearFechaHora } from '../utils/fechas';
-import { COLORES, ESPACIO, RADIO } from '../config/tema';
+import { COLORES, ESPACIO } from '../config/tema';
 
 /**
- * Elementos de lista que se repiten en varias pantallas.
+ * Elementos que se repiten en varias pantallas. Están pensados para ir dentro de <Lista>.
  */
 
 /** Abre un enlace (material, clase virtual, entrega) en el navegador o la app que corresponda. */
@@ -20,13 +20,16 @@ export async function abrirEnlace(url) {
   }
 }
 
-/** Bloque del horario: hora de inicio-fin, curso y detalle (docente o sección). */
+/**
+ * Bloque del horario: hora de inicio-fin, curso y detalle (docente o sección).
+ * `actual` resalta el bloque que se está dictando ahora.
+ */
 export function BloqueHorario({ bloque, actual = false }) {
   return (
     <View style={[estilos.bloque, actual && estilos.bloqueActual]}>
       <View style={estilos.horas}>
         <Texto variante="pequeno" negrita color={actual ? COLORES.blanco : COLORES.azul}>{bloque.hora_inicio}</Texto>
-        <Texto variante="diminuto" color={actual ? COLORES.crema : COLORES.textoSecundario}>{bloque.hora_fin}</Texto>
+        <Texto variante="diminuto" color={actual ? COLORES.crema : COLORES.textoSuave}>{bloque.hora_fin}</Texto>
       </View>
       <View style={estilos.flex}>
         <Texto negrita color={actual ? COLORES.blanco : COLORES.texto}>{bloque.curso}</Texto>
@@ -37,24 +40,36 @@ export function BloqueHorario({ bloque, actual = false }) {
   );
 }
 
-/** Clase virtual: tema, curso, fecha y botón para entrar al enlace. */
-export function ClaseVirtual({ clase, acciones }) {
+/** Receso dentro del horario (fila delgada en color crema). */
+export function BloqueReceso({ receso }) {
   return (
-    <Tarjeta colorBorde={COLORES.azul}>
-      <Texto negrita>{clase.tema || 'Clase virtual'}</Texto>
-      {clase.curso && <Texto variante="pequeno">{clase.curso}{clase.seccion ? ` · ${clase.seccion}` : ''}</Texto>}
-      <Texto variante="pequeno">
-        <Ionicons name="time-outline" size={13} /> {formatearFechaHora(clase.fecha)}
+    <View style={estilos.receso}>
+      <Ionicons name="cafe-outline" size={14} color={COLORES.guinda} />
+      <Texto variante="diminuto" negrita color={COLORES.guinda}>
+        {receso.hora_inicio} – {receso.hora_fin} · {receso.nombre}
       </Texto>
-      <View style={estilos.filaAcciones}>
-        <BotonEnlace texto="Entrar a la clase" icono="videocam-outline" url={clase.enlace} />
-        {acciones}
-      </View>
-    </Tarjeta>
+    </View>
   );
 }
 
-/** Botón pequeño que abre un enlace. */
+/** Clase virtual: al tocarla se abre el enlace (Meet, Zoom...). `acciones` va a la derecha. */
+export function FilaClaseVirtual({ clase, acciones }) {
+  const detalle = [clase.curso, clase.seccion].filter(Boolean).join(' · ');
+  return (
+    <ItemLista
+      icono="videocam"
+      colorIcono={COLORES.azul}
+      fondoIcono={COLORES.infoFondo}
+      titulo={clase.tema || 'Clase virtual'}
+      subtitulo={formatearFechaHora(clase.fecha)}
+      detalle={detalle || undefined}
+      derecha={acciones}
+      onPress={clase.enlace ? () => abrirEnlace(clase.enlace) : undefined}
+    />
+  );
+}
+
+/** Enlace pequeño en azul ("Abrir material", "Ver trabajo"...). No se muestra si no hay url. */
 export function BotonEnlace({ texto, icono = 'open-outline', url }) {
   if (!url) return null;
   return (
@@ -66,25 +81,24 @@ export function BotonEnlace({ texto, icono = 'open-outline', url }) {
 }
 
 const estilos = StyleSheet.create({
-  flex: { flex: 1 },
+  flex: { flex: 1, gap: 2 },
   bloque: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: ESPACIO.md,
-    padding: ESPACIO.md,
+    paddingHorizontal: ESPACIO.lg,
+    paddingVertical: ESPACIO.md,
     backgroundColor: COLORES.superficie,
-    borderRadius: RADIO.md,
-    borderWidth: 1,
-    borderColor: COLORES.bordeSuave,
-    marginBottom: ESPACIO.sm,
   },
-  bloqueActual: { backgroundColor: COLORES.azul, borderColor: COLORES.azul },
-  horas: { width: 48, alignItems: 'center' },
-  filaAcciones: { flexDirection: 'row', flexWrap: 'wrap', gap: ESPACIO.md, marginTop: ESPACIO.xs },
-  enlace: {
+  bloqueActual: { backgroundColor: COLORES.azul },
+  horas: { width: 44 },
+  receso: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: ESPACIO.xs,
-    paddingVertical: ESPACIO.xs,
+    paddingVertical: ESPACIO.xs + 2,
+    backgroundColor: COLORES.crema,
   },
+  enlace: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.xs, paddingVertical: ESPACIO.xs },
 });

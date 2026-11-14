@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Pantalla from '../../components/Pantalla';
 import Tarjeta from '../../components/Tarjeta';
@@ -16,7 +16,7 @@ import { avisarResultado } from '../../utils/dialogos';
 import { esFechaValida, hoyISO } from '../../utils/fechas';
 import { primerError, validarEnlace, validarTexto } from '../../utils/validaciones';
 import { TIPOS_FALTA } from '../../config/estados';
-import { COLORES, ESPACIO, RADIO } from '../../config/tema';
+import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
 
 /**
  * RegistrarReporteView (auxiliar): registra un reporte (parte) de conducta: tipo de falta,
@@ -70,13 +70,14 @@ export default function RegistrarReporteView({ navigation, route }) {
           {(errorLocal || accion.error) && <Aviso tono="error">{errorLocal || accion.error}</Aviso>}
 
           <Seccion titulo="Tipo de falta" />
-          {lista.map((f) => {
+          <View style={estilos.listaFaltas}>
+          {lista.map((f, i) => {
             const elegida = f.id_falta === idFalta;
             return (
               <Pressable
                 key={f.id_falta}
                 onPress={() => setIdFalta(f.id_falta)}
-                style={[estilos.falta, elegida && estilos.faltaElegida]}
+                style={[estilos.falta, i > 0 && estilos.conLinea, elegida && estilos.faltaElegida]}
                 accessibilityRole="radio"
                 accessibilityState={{ checked: elegida }}
               >
@@ -87,6 +88,7 @@ export default function RegistrarReporteView({ navigation, route }) {
               </Pressable>
             );
           })}
+          </View>
 
           <Seccion titulo="Detalle" />
           <Tarjeta>
@@ -108,17 +110,10 @@ export default function RegistrarReporteView({ navigation, route }) {
 }
 
 const estilos = StyleSheet.create({
-  falta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: ESPACIO.sm,
-    padding: ESPACIO.md,
-    marginBottom: ESPACIO.sm,
-    backgroundColor: COLORES.superficie,
-    borderRadius: RADIO.md,
-    borderWidth: 1.5,
-    borderColor: COLORES.bordeSuave,
-  },
-  faltaElegida: { borderColor: COLORES.guinda, backgroundColor: COLORES.crema },
+  // Todas las faltas en una sola tarjeta; la elegida se pinta de crema.
+  listaFaltas: { backgroundColor: COLORES.superficie, borderRadius: RADIO.lg, overflow: 'hidden', ...SOMBRA },
+  falta: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.sm, padding: ESPACIO.md },
+  conLinea: { borderTopWidth: 1, borderTopColor: COLORES.linea },
+  faltaElegida: { backgroundColor: COLORES.crema },
   flex: { flex: 1 },
 });

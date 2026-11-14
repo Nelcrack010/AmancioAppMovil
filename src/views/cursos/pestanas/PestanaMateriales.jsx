@@ -1,21 +1,19 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../../components/Pantalla';
-import Tarjeta from '../../../components/Tarjeta';
-import Texto from '../../../components/Texto';
-import Etiqueta from '../../../components/Etiqueta';
 import Boton from '../../../components/Boton';
+import Lista, { BotonIcono, ItemLista } from '../../../components/Lista';
 import { Vacio } from '../../../components/Estados';
-import { BotonEnlace } from '../../../components/Items';
+import { abrirEnlace } from '../../../components/Items';
 import useConsulta from '../../../viewmodels/useConsulta';
 import AcademicoRepository from '../../../repositories/academicoRepository';
 import { avisar, confirmar } from '../../../utils/dialogos';
 import { formatearFecha } from '../../../utils/fechas';
-import { ESPACIO } from '../../../config/tema';
+import { COLORES } from '../../../config/tema';
 
 /**
  * Pestaña "Materiales": archivos y enlaces publicados por el docente.
- * El docente además puede subir, editar y eliminar materiales.
+ * Al tocar un material se abre su enlace. El docente además puede subir, editar y eliminar.
  */
 export default function PestanaMateriales({ idCarga, esDocente, navigation }) {
   const materiales = useConsulta(() => AcademicoRepository.materiales(idCarga), [idCarga]);
@@ -40,32 +38,33 @@ export default function PestanaMateriales({ idCarga, esDocente, navigation }) {
     >
       {(datos) => (datos.materiales.length === 0 ? (
         <Vacio icono="folder-open-outline" titulo="Sin materiales" mensaje="El docente aún no publicó materiales." />
-      ) : datos.materiales.map((m) => (
-        <Tarjeta key={m.id_material}>
-          <View style={estilos.fila}>
-            <Texto negrita style={estilos.flex}>{m.titulo}</Texto>
-            <Etiqueta texto={`${m.bimestre}° bim.`} tono="guinda" />
-          </View>
-          {m.descripcion && <Texto variante="pequeno">{m.descripcion}</Texto>}
-          <Texto variante="diminuto">Publicado el {formatearFecha(m.fecha_publicacion)}</Texto>
-          <View style={estilos.acciones}>
-            <BotonEnlace texto="Abrir material" url={m.archivo_url} />
-            {esDocente && (
-              <View style={estilos.fila}>
-                <Boton titulo="Editar" variante="texto" pequeno icono="create-outline"
-                  onPress={() => navigation.navigate('Publicar', { tipo: 'material', idCarga, item: m, titulo: 'Editar material' })} />
-                <Boton titulo="Eliminar" variante="texto" pequeno icono="trash-outline" onPress={() => eliminar(m)} />
-              </View>
-            )}
-          </View>
-        </Tarjeta>
-      )))}
+      ) : (
+        <Lista>
+          {datos.materiales.map((m) => (
+            <ItemLista
+              key={m.id_material}
+              icono="folder-open"
+              colorIcono={COLORES.azul}
+              fondoIcono={COLORES.infoFondo}
+              titulo={m.titulo}
+              subtitulo={m.descripcion}
+              detalle={`${m.bimestre}° bimestre · ${formatearFecha(m.fecha_publicacion)}`}
+              derecha={esDocente && (
+                <View style={estilos.acciones}>
+                  <BotonIcono icono="create-outline" etiqueta="Editar material"
+                    onPress={() => navigation.navigate('Publicar', { tipo: 'material', idCarga, item: m, titulo: 'Editar material' })} />
+                  <BotonIcono icono="trash-outline" color={COLORES.error} etiqueta="Eliminar material" onPress={() => eliminar(m)} />
+                </View>
+              )}
+              onPress={m.archivo_url ? () => abrirEnlace(m.archivo_url) : undefined}
+            />
+          ))}
+        </Lista>
+      ))}
     </Pantalla>
   );
 }
 
 const estilos = StyleSheet.create({
-  fila: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.sm },
-  flex: { flex: 1 },
-  acciones: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' },
+  acciones: { flexDirection: 'row' },
 });

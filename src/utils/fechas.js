@@ -19,12 +19,17 @@ export function formatearFecha(iso) {
   return `${dia} ${MESES[mes - 1]} ${anio}`;
 }
 
-/** "2026-10-04T18:05:00" → "4 oct 2026, 18:05" */
+/**
+ * "2026-10-04T18:05:00" → "4 oct, 18:05"  (si es del año en curso, el año no se muestra
+ * para que el texto sea más corto)  ·  "2025-10-04T18:05:00" → "4 oct 2025, 18:05"
+ */
 export function formatearFechaHora(iso) {
   if (!iso) return '—';
   const texto = String(iso);
   const hora = texto.length >= 16 ? texto.slice(11, 16) : '';
-  return hora ? `${formatearFecha(texto)}, ${hora}` : formatearFecha(texto);
+  let fecha = formatearFecha(texto);
+  if (texto.slice(0, 4) === String(new Date().getFullYear())) fecha = fecha.replace(/ \d{4}$/, '');
+  return hora ? `${fecha}, ${hora}` : fecha;
 }
 
 /** "2026-10-04T18:05:00" → "18:05" */

@@ -57,7 +57,7 @@ function NotasDelBimestre({ bimestre }) {
       {(datos) => (datos.cursos.length === 0 ? (
         <Vacio icono="ribbon-outline" titulo="Sin cursos" />
       ) : datos.cursos.map((c) => (
-        <Tarjeta key={c.id_carga_academica} colorBorde={colorNota(c.promedio)}>
+        <Tarjeta key={c.id_carga_academica}>
           <View style={estilos.fila}>
             <View style={estilos.flex}>
               <Texto negrita>{c.curso}</Texto>

@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
-import Tarjeta from '../../components/Tarjeta';
-import Texto from '../../components/Texto';
+import Lista, { BotonIcono, ItemLista } from '../../components/Lista';
 import Campo from '../../components/Campo';
-import Boton from '../../components/Boton';
 import Selector from '../../components/Selector';
 import { Avatar } from '../../components/Basicos';
 import { Cargando, ErrorVista, Vacio } from '../../components/Estados';
@@ -12,7 +9,7 @@ import useConsulta from '../../viewmodels/useConsulta';
 import AcademicoRepository from '../../repositories/academicoRepository';
 import AsistenciaRepository from '../../repositories/asistenciaRepository';
 import { hoyISO } from '../../utils/fechas';
-import { ESPACIO } from '../../config/tema';
+import { COLORES } from '../../config/tema';
 
 /**
  * ConductaView (auxiliar): elegir sección y estudiante para registrar un reporte de
@@ -50,30 +47,31 @@ export default function ConductaView({ navigation }) {
       ) : (() => {
         const lista = alumnos.datos.filter((a) => `${a.nombres} ${a.apellidos}`.toLowerCase().includes(texto));
         if (lista.length === 0) return <Vacio icono="people-outline" titulo="Sin estudiantes" />;
-        return lista.map((a) => {
-          const nombre = `${a.nombres} ${a.apellidos}`;
-          return (
-            <Tarjeta key={a.id_alumno} onPress={() => navigation.navigate('ConductaAlumno', { idAlumno: a.id_alumno, titulo: a.nombres })}>
-              <View style={estilos.fila}>
-                <Avatar nombre={nombre} tamano={38} />
-                <Texto negrita style={estilos.flex}>{a.apellidos}, {a.nombres}</Texto>
-                <Boton
-                  titulo="Reporte"
-                  icono="add"
-                  variante="guinda"
-                  pequeno
-                  onPress={() => navigation.navigate('RegistrarReporte', { idAlumno: a.id_alumno, nombre })}
+        return (
+          <Lista>
+            {lista.map((a) => {
+              const nombre = `${a.nombres} ${a.apellidos}`;
+              return (
+                <ItemLista
+                  key={a.id_alumno}
+                  izquierda={<Avatar nombre={nombre} tamano={36} />}
+                  titulo={`${a.apellidos}, ${a.nombres}`}
+                  subtitulo="Ver conducta y reportes"
+                  derecha={(
+                    <BotonIcono
+                      icono="add-circle"
+                      color={COLORES.guinda}
+                      etiqueta={`Registrar reporte para ${a.nombres}`}
+                      onPress={() => navigation.navigate('RegistrarReporte', { idAlumno: a.id_alumno, nombre })}
+                    />
+                  )}
+                  onPress={() => navigation.navigate('ConductaAlumno', { idAlumno: a.id_alumno, titulo: a.nombres })}
                 />
-              </View>
-            </Tarjeta>
-          );
-        });
+              );
+            })}
+          </Lista>
+        );
       })()}
     </Pantalla>
   );
 }
-
-const estilos = StyleSheet.create({
-  fila: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.md },
-  flex: { flex: 1 },
-});

@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
-import Tarjeta from '../../components/Tarjeta';
-import Texto from '../../components/Texto';
 import Campo from '../../components/Campo';
+import Lista, { ItemLista } from '../../components/Lista';
 import { Avatar, Seccion } from '../../components/Basicos';
 import { Vacio } from '../../components/Estados';
 import useConsulta from '../../viewmodels/useConsulta';
 import MensajesRepository from '../../repositories/mensajesRepository';
 import { NOMBRES_ROL } from '../../config/estados';
-import { ESPACIO } from '../../config/tema';
 
 /** Orden en que se agrupan los contactos. */
 const ORDEN_ROLES = ['DOCENTE', 'AUXILIAR', 'PSICOLOGO', 'ADMIN', 'ALUMNO'];
@@ -39,17 +37,16 @@ export default function ContactosView({ navigation }) {
             {grupos.map((g) => (
               <View key={g.rol}>
                 <Seccion titulo={NOMBRES_ROL[g.rol] || g.rol} />
-                {g.personas.map((c) => (
-                  <Tarjeta
-                    key={c.id_usuario}
-                    onPress={() => navigation.replace('Chat', { contacto: c, titulo: c.nombre })}
-                  >
-                    <View style={estilos.fila}>
-                      <Avatar nombre={c.nombre} tamano={38} />
-                      <Texto negrita style={estilos.flex}>{c.nombre}</Texto>
-                    </View>
-                  </Tarjeta>
-                ))}
+                <Lista>
+                  {g.personas.map((c) => (
+                    <ItemLista
+                      key={c.id_usuario}
+                      izquierda={<Avatar nombre={c.nombre} tamano={36} />}
+                      titulo={c.nombre}
+                      onPress={() => navigation.replace('Chat', { contacto: c, titulo: c.nombre })}
+                    />
+                  ))}
+                </Lista>
               </View>
             ))}
           </>
@@ -58,8 +55,3 @@ export default function ContactosView({ navigation }) {
     </Pantalla>
   );
 }
-
-const estilos = StyleSheet.create({
-  fila: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.md },
-  flex: { flex: 1 },
-});

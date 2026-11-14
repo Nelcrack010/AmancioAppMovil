@@ -12,7 +12,7 @@ import { useGuardiaSalida } from '../../navigation/guardiaSalida';
 import { avisarResultado, confirmar } from '../../utils/dialogos';
 import { formatearFecha, hoyISO, nombreDia, sumarDias } from '../../utils/fechas';
 import { ESTADOS_ASISTENCIA } from '../../config/estados';
-import { COLORES, ESPACIO, RADIO } from '../../config/tema';
+import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
 
 const ESTADOS = ['P', 'T', 'F', 'J'];
 const COLOR_ESTADO = { P: COLORES.exito, T: COLORES.alerta, F: COLORES.error, J: COLORES.azul };
@@ -105,8 +105,9 @@ export default function RegistrarAsistenciaView({ route }) {
             titulo={`Estudiantes (${vm.alumnos.datos.length})`}
             accion={<Boton titulo="Todos presentes" variante="texto" pequeno onPress={() => vm.marcarTodos('P')} />}
           />
+          <View style={estilos.listaAlumnos}>
           {vm.alumnos.datos.map((a, i) => (
-            <View key={a.id_alumno} style={estilos.alumno}>
+            <View key={a.id_alumno} style={[estilos.alumno, i > 0 && estilos.conLinea]}>
               <Texto style={estilos.nombre} numberOfLines={2}>{i + 1}. {a.apellidos}, {a.nombres}</Texto>
               <View style={estilos.estados}>
                 {ESTADOS.map((e) => {
@@ -127,6 +128,7 @@ export default function RegistrarAsistenciaView({ route }) {
               </View>
             </View>
           ))}
+          </View>
           <Texto variante="diminuto" centrado>P: presente · T: tardanza · F: falta · J: justificada</Texto>
         </>
       )}
@@ -139,24 +141,23 @@ const estilos = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORES.superficie,
-    borderRadius: RADIO.md,
-    borderWidth: 1,
-    borderColor: COLORES.borde,
+    borderRadius: RADIO.lg,
     marginBottom: ESPACIO.md,
+    ...SOMBRA,
   },
   flecha: { padding: ESPACIO.md },
   inactivo: { opacity: 0.3 },
   centro: { flex: 1, alignItems: 'center' },
+  // Todos los estudiantes en una sola tarjeta, separados por líneas finas.
+  listaAlumnos: { backgroundColor: COLORES.superficie, borderRadius: RADIO.lg, marginBottom: ESPACIO.md, ...SOMBRA },
   alumno: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: ESPACIO.sm,
-    paddingVertical: ESPACIO.sm,
+    paddingVertical: ESPACIO.sm + 2,
     paddingHorizontal: ESPACIO.md,
-    marginBottom: ESPACIO.xs,
-    backgroundColor: COLORES.superficie,
-    borderRadius: RADIO.md,
   },
+  conLinea: { borderTopWidth: 1, borderTopColor: COLORES.linea },
   nombre: { flex: 1 },
   estados: { flexDirection: 'row', gap: 6 },
   estado: {

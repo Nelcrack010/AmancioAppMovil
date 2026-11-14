@@ -1,14 +1,17 @@
 import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../../components/Pantalla';
 import Boton from '../../../components/Boton';
+import Lista, { BotonIcono } from '../../../components/Lista';
 import { Vacio } from '../../../components/Estados';
-import { ClaseVirtual } from '../../../components/Items';
+import { FilaClaseVirtual } from '../../../components/Items';
 import useConsulta from '../../../viewmodels/useConsulta';
 import AcademicoRepository from '../../../repositories/academicoRepository';
 import { avisar, confirmar } from '../../../utils/dialogos';
+import { COLORES } from '../../../config/tema';
 
 /**
- * Pestaña "Clases virtuales": enlaces de las clases (Meet, Zoom...) del curso.
+ * Pestaña "Clases virtuales": enlaces de las clases (Meet, Zoom...). Al tocar una se abre.
  * El docente además puede programar, editar y eliminar clases.
  */
 export default function PestanaClases({ idCarga, esDocente, navigation }) {
@@ -34,19 +37,27 @@ export default function PestanaClases({ idCarga, esDocente, navigation }) {
     >
       {(datos) => (datos.clases.length === 0 ? (
         <Vacio icono="videocam-outline" titulo="Sin clases virtuales" mensaje="No hay clases virtuales programadas." />
-      ) : datos.clases.map((c) => (
-        <ClaseVirtual
-          key={c.id_clase_virtual}
-          clase={c}
-          acciones={esDocente && (
-            <>
-              <Boton titulo="Editar" variante="texto" pequeno icono="create-outline"
-                onPress={() => navigation.navigate('Publicar', { tipo: 'clase', idCarga, item: c, titulo: 'Editar clase' })} />
-              <Boton titulo="Eliminar" variante="texto" pequeno icono="trash-outline" onPress={() => eliminar(c)} />
-            </>
-          )}
-        />
-      )))}
+      ) : (
+        <Lista>
+          {datos.clases.map((c) => (
+            <FilaClaseVirtual
+              key={c.id_clase_virtual}
+              clase={c}
+              acciones={esDocente && (
+                <View style={estilos.acciones}>
+                  <BotonIcono icono="create-outline" etiqueta="Editar clase"
+                    onPress={() => navigation.navigate('Publicar', { tipo: 'clase', idCarga, item: c, titulo: 'Editar clase' })} />
+                  <BotonIcono icono="trash-outline" color={COLORES.error} etiqueta="Eliminar clase" onPress={() => eliminar(c)} />
+                </View>
+              )}
+            />
+          ))}
+        </Lista>
+      ))}
     </Pantalla>
   );
 }
+
+const estilos = StyleSheet.create({
+  acciones: { flexDirection: 'row' },
+});

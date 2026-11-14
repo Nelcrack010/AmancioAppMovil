@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Pantalla from '../../components/Pantalla';
-import Tarjeta from '../../components/Tarjeta';
+import Lista, { ItemLista } from '../../components/Lista';
 import Texto from '../../components/Texto';
 import Etiqueta from '../../components/Etiqueta';
 import Selector from '../../components/Selector';
@@ -43,7 +43,7 @@ export default function MiAsistenciaView() {
               <Dato valor={r.J} rotulo="Justificadas" color={COLORES.azul} />
             </FilaDatos>
             {total > 0 && (
-              <Texto variante="pequeno" centrado>
+              <Texto variante="pequeno" centrado style={estilos.porcentaje}>
                 Asistencia: {Math.round(((r.P + r.T) * 100) / total)}% de {total} día(s) registrados
               </Texto>
             )}
@@ -61,18 +61,21 @@ export default function MiAsistenciaView() {
             )}
             {registros.length === 0 ? (
               <Vacio icono="calendar-outline" titulo="Sin registros" />
-            ) : registros.map((x) => {
-              const estado = infoEstado(ESTADOS_ASISTENCIA, x.estado);
-              return (
-                <Tarjeta key={x.fecha}>
-                  <View style={estilos.fila}>
-                    <Texto style={estilos.flex}>{nombreDia(x.fecha)}, {formatearFecha(x.fecha)}</Texto>
-                    <Etiqueta texto={estado.texto} tono={estado.tono} />
-                  </View>
-                  {x.observacion && <Texto variante="pequeno">{x.observacion}</Texto>}
-                </Tarjeta>
-              );
-            })}
+            ) : (
+              <Lista>
+                {registros.map((x) => {
+                  const estado = infoEstado(ESTADOS_ASISTENCIA, x.estado);
+                  return (
+                    <ItemLista
+                      key={x.fecha}
+                      titulo={`${nombreDia(x.fecha)}, ${formatearFecha(x.fecha)}`}
+                      subtitulo={x.observacion}
+                      derecha={<Etiqueta texto={estado.texto} tono={estado.tono} />}
+                    />
+                  );
+                })}
+              </Lista>
+            )}
           </>
         );
       }}
@@ -81,6 +84,5 @@ export default function MiAsistenciaView() {
 }
 
 const estilos = StyleSheet.create({
-  fila: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.sm },
-  flex: { flex: 1 },
+  porcentaje: { marginBottom: ESPACIO.xs },
 });

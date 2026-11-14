@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
 import Selector from '../../components/Selector';
-import Texto from '../../components/Texto';
+import Lista from '../../components/Lista';
 import { Seccion } from '../../components/Basicos';
 import { Vacio } from '../../components/Estados';
-import { BloqueHorario } from '../../components/Items';
+import { BloqueHorario, BloqueReceso } from '../../components/Items';
 import useConsulta from '../../viewmodels/useConsulta';
 import AcademicoRepository from '../../repositories/academicoRepository';
 import { hoyISO, nombreDia } from '../../utils/fechas';
-import { COLORES, ESPACIO, RADIO } from '../../config/tema';
 
 const SEMANA = 'SEMANA';
 
@@ -43,19 +42,18 @@ export default function HorarioView() {
             {diasAMostrar.map((d) => (
               <View key={d.dia}>
                 {dia === SEMANA && <Seccion titulo={d.dia} />}
-                {conRecesos(d.bloques, datos.recesos).map((b) => (b.esReceso ? (
-                  <View key={`r-${b.hora_inicio}`} style={estilos.receso}>
-                    <Texto variante="diminuto" negrita color={COLORES.guinda}>
-                      {b.hora_inicio} – {b.hora_fin} · {b.nombre}
-                    </Texto>
-                  </View>
-                ) : (
-                  <BloqueHorario
-                    key={`${b.hora_inicio}-${b.curso}`}
-                    bloque={b}
-                    actual={d.dia === hoy && esBloqueActual(b)}
-                  />
-                )))}
+                {/* Todos los bloques del día en una sola lista, con los recesos intercalados */}
+                <Lista>
+                  {conRecesos(d.bloques, datos.recesos).map((b) => (b.esReceso ? (
+                    <BloqueReceso key={`r-${b.hora_inicio}`} receso={b} />
+                  ) : (
+                    <BloqueHorario
+                      key={`${b.hora_inicio}-${b.curso}`}
+                      bloque={b}
+                      actual={d.dia === hoy && esBloqueActual(b)}
+                    />
+                  )))}
+                </Lista>
               </View>
             ))}
           </>
@@ -80,13 +78,3 @@ function esBloqueActual(bloque) {
   const ahora = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   return bloque.hora_inicio <= ahora && ahora < bloque.hora_fin;
 }
-
-const estilos = StyleSheet.create({
-  receso: {
-    alignItems: 'center',
-    paddingVertical: ESPACIO.xs,
-    marginBottom: ESPACIO.sm,
-    borderRadius: RADIO.sm,
-    backgroundColor: COLORES.crema,
-  },
-});

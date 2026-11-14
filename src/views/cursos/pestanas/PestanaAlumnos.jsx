@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Pantalla from '../../../components/Pantalla';
-import Tarjeta from '../../../components/Tarjeta';
 import Texto from '../../../components/Texto';
+import Lista, { ItemLista } from '../../../components/Lista';
 import { Avatar } from '../../../components/Basicos';
 import { Vacio } from '../../../components/Estados';
 import useConsulta from '../../../viewmodels/useConsulta';
@@ -23,23 +23,17 @@ export default function PestanaAlumnos({ idCarga, navigation }) {
       ) : (
         <>
           <Texto variante="pequeno" style={estilos.total}>{datos.alumnos.length} estudiante(s) matriculado(s)</Texto>
-          {datos.alumnos.map((a, i) => {
-            const nombre = `${a.apellidos}, ${a.nombres}`;
-            return (
-              <Tarjeta
+          <Lista>
+            {datos.alumnos.map((a) => (
+              <ItemLista
                 key={a.id_alumno}
+                izquierda={<Avatar nombre={`${a.nombres} ${a.apellidos}`} tamano={36} />}
+                titulo={`${a.apellidos}, ${a.nombres}`}
+                subtitulo={`DNI ${a.dni}`}
                 onPress={() => navigation.navigate('ConductaAlumno', { idAlumno: a.id_alumno, titulo: a.nombres })}
-              >
-                <View style={estilos.fila}>
-                  <Avatar nombre={`${a.nombres} ${a.apellidos}`} tamano={36} />
-                  <View style={estilos.flex}>
-                    <Texto negrita>{i + 1}. {nombre}</Texto>
-                    <Texto variante="diminuto">DNI {a.dni}</Texto>
-                  </View>
-                </View>
-              </Tarjeta>
-            );
-          })}
+              />
+            ))}
+          </Lista>
         </>
       ))}
     </Pantalla>
@@ -47,7 +41,5 @@ export default function PestanaAlumnos({ idCarga, navigation }) {
 }
 
 const estilos = StyleSheet.create({
-  total: { marginBottom: ESPACIO.sm },
-  fila: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.md },
-  flex: { flex: 1 },
+  total: { marginBottom: ESPACIO.sm, paddingHorizontal: ESPACIO.xs },
 });

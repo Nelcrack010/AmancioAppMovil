@@ -1,6 +1,5 @@
 import React from 'react';
-import Tarjeta from '../../components/Tarjeta';
-import Texto from '../../components/Texto';
+import Lista, { ItemLista } from '../../components/Lista';
 import { Seccion, Dato, FilaDatos } from '../../components/Basicos';
 import { Aviso } from '../../components/Estados';
 import { COLORES } from '../../config/tema';
@@ -19,26 +18,37 @@ export default function InicioAuxiliar({ datos, navigation }) {
       <Seccion titulo="Asistencia pendiente de hoy" />
       {pendientes.length === 0 ? (
         <Aviso tono="exito">Todas las secciones tienen la asistencia de hoy registrada.</Aviso>
-      ) : pendientes.map((s) => (
-        <Tarjeta
-          key={s.id_seccion}
-          colorBorde={COLORES.alerta}
-          onPress={() => navigation.navigate('RegistrarAsistencia', { idSeccion: s.id_seccion })}
-        >
-          <Texto negrita>{s.seccion}</Texto>
-          <Texto variante="pequeno">{s.alumnos} estudiantes · toca para registrar</Texto>
-        </Tarjeta>
-      ))}
+      ) : (
+        <Lista>
+          {pendientes.map((s) => (
+            <ItemLista
+              key={s.id_seccion}
+              icono="checkmark-done"
+              colorIcono={COLORES.alerta}
+              fondoIcono={COLORES.alertaFondo}
+              titulo={s.seccion}
+              subtitulo={`${s.alumnos} estudiante(s) · toca para registrar`}
+              onPress={() => navigation.navigate('RegistrarAsistencia', { idSeccion: s.id_seccion })}
+            />
+          ))}
+        </Lista>
+      )}
 
       <Seccion titulo="Accesos rápidos" />
-      <Tarjeta onPress={() => navigation.navigate('Conducta')}>
-        <Texto negrita>Registrar un reporte de conducta</Texto>
-        <Texto variante="pequeno">Elige la sección y el estudiante.</Texto>
-      </Tarjeta>
-      <Tarjeta onPress={() => navigation.navigate('ReporteAsistencia')}>
-        <Texto negrita>Reporte de asistencia</Texto>
-        <Texto variante="pequeno">Resumen por sección y rango de fechas.</Texto>
-      </Tarjeta>
+      <Lista>
+        <ItemLista
+          icono="shield-checkmark"
+          titulo="Registrar un reporte de conducta"
+          subtitulo="Elige la sección y el estudiante"
+          onPress={() => navigation.navigate('Conducta')}
+        />
+        <ItemLista
+          icono="stats-chart"
+          titulo="Reporte de asistencia"
+          subtitulo="Resumen por sección y rango de fechas"
+          onPress={() => navigation.navigate('ReporteAsistencia')}
+        />
+      </Lista>
     </>
   );
 }

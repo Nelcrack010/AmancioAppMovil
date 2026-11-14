@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Pantalla from '../../components/Pantalla';
-import Tarjeta from '../../components/Tarjeta';
+import Lista, { ItemLista } from '../../components/Lista';
 import Texto from '../../components/Texto';
 import Etiqueta from '../../components/Etiqueta';
 import { Seccion } from '../../components/Basicos';
@@ -10,7 +10,7 @@ import useConsulta from '../../viewmodels/useConsulta';
 import ConductaRepository from '../../repositories/conductaRepository';
 import { formatearFecha, hoyISO, nombreDia, soloHora, sumarDias } from '../../utils/fechas';
 import { ESTADOS_CITA, infoEstado } from '../../config/estados';
-import { COLORES, ESPACIO, RADIO } from '../../config/tema';
+import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
 
 /**
  * AgendaView (psicólogo): citas de un día (por defecto hoy) y las solicitudes que aún
@@ -42,32 +42,38 @@ export default function AgendaView({ navigation }) {
 
           <Seccion titulo={`Citas del día (${datos.citas.length})`} />
           {datos.citas.length === 0 && <Texto variante="pequeno">No hay citas este día.</Texto>}
-          {datos.citas.map((c) => {
-            const estado = infoEstado(ESTADOS_CITA, c.estado);
-            return (
-              <Tarjeta key={c.id_cita} colorBorde={COLORES.azul} onPress={() => abrir(c)}>
-                <View style={estilos.fila}>
-                  <Texto variante="subtitulo" color={COLORES.azul}>{soloHora(c.fecha_cita)}</Texto>
-                  <Texto negrita style={estilos.flex}>{c.alumno}</Texto>
-                  <Etiqueta texto={estado.texto} tono={estado.tono} />
-                </View>
-                <Texto variante="pequeno">{c.motivo}</Texto>
-              </Tarjeta>
-            );
-          })}
+          <Lista>
+            {datos.citas.map((c) => {
+              const estado = infoEstado(ESTADOS_CITA, c.estado);
+              return (
+                <ItemLista
+                  key={c.id_cita}
+                  izquierda={<Texto variante="subtitulo" color={COLORES.azul}>{soloHora(c.fecha_cita)}</Texto>}
+                  titulo={c.alumno}
+                  subtitulo={c.motivo}
+                  derecha={<Etiqueta texto={estado.texto} tono={estado.tono} />}
+                  onPress={() => abrir(c)}
+                />
+              );
+            })}
+          </Lista>
 
           <Seccion titulo={`Solicitudes por programar (${datos.pendientes.length})`} />
           {datos.pendientes.length === 0 && <Texto variante="pequeno">No hay solicitudes pendientes.</Texto>}
-          {datos.pendientes.map((c) => (
-            <Tarjeta key={c.id_cita} colorBorde={COLORES.alerta} onPress={() => abrir(c)}>
-              <Texto negrita>{c.alumno}</Texto>
-              <Texto variante="pequeno">{c.motivo}</Texto>
-              <Texto variante="diminuto">
-                Solicitada el {formatearFecha(c.fecha_solicitud)}
-                {c.disponibilidad ? ` · ${c.disponibilidad}` : ''}
-              </Texto>
-            </Tarjeta>
-          ))}
+          <Lista>
+            {datos.pendientes.map((c) => (
+              <ItemLista
+                key={c.id_cita}
+                icono="time"
+                colorIcono={COLORES.alerta}
+                fondoIcono={COLORES.alertaFondo}
+                titulo={c.alumno}
+                subtitulo={c.motivo}
+                detalle={`Solicitada el ${formatearFecha(c.fecha_solicitud)}${c.disponibilidad ? ` · ${c.disponibilidad}` : ''}`}
+                onPress={() => abrir(c)}
+              />
+            ))}
+          </Lista>
         </>
       )}
     </Pantalla>
@@ -77,10 +83,8 @@ export default function AgendaView({ navigation }) {
 const estilos = StyleSheet.create({
   fecha: {
     flexDirection: 'row', alignItems: 'center', marginBottom: ESPACIO.sm,
-    backgroundColor: COLORES.superficie, borderRadius: RADIO.md, borderWidth: 1, borderColor: COLORES.borde,
+    backgroundColor: COLORES.superficie, borderRadius: RADIO.lg, ...SOMBRA,
   },
   flecha: { padding: ESPACIO.md },
   centro: { flex: 1, alignItems: 'center' },
-  fila: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.sm },
-  flex: { flex: 1 },
 });

@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
 import Tarjeta from '../../components/Tarjeta';
 import Texto from '../../components/Texto';
-import Boton from '../../components/Boton';
+import Lista, { ItemLista } from '../../components/Lista';
 import Etiqueta from '../../components/Etiqueta';
 import { Avatar, Fila, Seccion } from '../../components/Basicos';
 import { useSesion } from '../../context/SesionContext';
@@ -81,15 +81,20 @@ export default function PerfilView({ navigation }) {
             {usuario.rol === 'ALUMNO' && <Matricula />}
 
             <Seccion titulo="Cuenta" />
-            <View style={estilos.botones}>
-              <Boton titulo="Editar mis datos" icono="create-outline" variante="secundario"
+            <Lista>
+              <ItemLista icono="create-outline" titulo="Editar mis datos"
                 onPress={() => navigation.navigate('EditarPerfil', { perfil: datos })} />
-              <Boton titulo="Cambiar contraseña" icono="key-outline" variante="secundario"
+              <ItemLista icono="key-outline" titulo="Cambiar contraseña"
                 onPress={() => navigation.navigate('CambiarPassword')} />
-              <Boton titulo="Operaciones pendientes" icono="cloud-upload-outline" variante="secundario"
-                onPress={() => navigation.navigate('Pendientes')} />
-              <Boton titulo="Cerrar sesión" icono="log-out-outline" variante="peligro" onPress={salir} />
-            </View>
+              <ItemLista
+                icono="cloud-upload-outline"
+                titulo="Operaciones pendientes"
+                derecha={pendientes > 0 && <Etiqueta texto={String(pendientes)} tono="alerta" />}
+                onPress={() => navigation.navigate('Pendientes')}
+              />
+              <ItemLista icono="log-out-outline" colorIcono={COLORES.error} fondoIcono={COLORES.errorFondo}
+                titulo="Cerrar sesión" onPress={salir} />
+            </Lista>
           </>
         );
       }}
@@ -120,5 +125,4 @@ function Matricula() {
 const estilos = StyleSheet.create({
   cabecera: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.md },
   flex: { flex: 1 },
-  botones: { gap: ESPACIO.sm },
 });

@@ -1,13 +1,13 @@
 import React from 'react';
-import Tarjeta from '../../components/Tarjeta';
 import Texto from '../../components/Texto';
+import Lista, { ItemLista } from '../../components/Lista';
 import { Seccion, Dato, FilaDatos } from '../../components/Basicos';
 import { formatearFecha, soloHora } from '../../utils/fechas';
 import { COLORES } from '../../config/tema';
 
 /** Panel del psicólogo: citas de hoy y solicitudes pendientes de programar. */
 export default function InicioPsicologo({ datos, navigation }) {
-  const abrir = (cita) => navigation.navigate('CitaDetalle', { cita });
+  const abrir = (cita) => navigation.navigate('CitaDetalle', { cita, titulo: cita.alumno });
 
   return (
     <>
@@ -19,31 +19,41 @@ export default function InicioPsicologo({ datos, navigation }) {
       <Seccion titulo="Citas de hoy" />
       {datos.citas_de_hoy.length === 0 ? (
         <Texto variante="pequeno">No tienes citas programadas para hoy.</Texto>
-      ) : datos.citas_de_hoy.map((c) => (
-        <Tarjeta key={c.id_cita} colorBorde={COLORES.azul} onPress={() => abrir(c)}>
-          <Texto negrita>{soloHora(c.fecha_cita)} · {c.alumno}</Texto>
-          <Texto variante="pequeno">{c.motivo}</Texto>
-        </Tarjeta>
-      ))}
+      ) : (
+        <Lista>
+          {datos.citas_de_hoy.map((c) => (
+            <ItemLista
+              key={c.id_cita}
+              izquierda={<Texto variante="subtitulo" color={COLORES.azul}>{soloHora(c.fecha_cita)}</Texto>}
+              titulo={c.alumno}
+              subtitulo={c.motivo}
+              onPress={() => abrir(c)}
+            />
+          ))}
+        </Lista>
+      )}
 
       <Seccion titulo="Solicitudes por programar" />
       {datos.solicitudes.length === 0 ? (
         <Texto variante="pequeno">No hay solicitudes pendientes.</Texto>
-      ) : datos.solicitudes.map((c) => (
-        <Tarjeta key={c.id_cita} colorBorde={COLORES.alerta} onPress={() => abrir(c)}>
-          <Texto negrita>{c.alumno}</Texto>
-          <Texto variante="pequeno">{c.motivo}</Texto>
-          <Texto variante="diminuto">
-            Solicitada el {formatearFecha(c.fecha_solicitud)}
-            {c.disponibilidad ? ` · Disponibilidad: ${c.disponibilidad}` : ''}
-          </Texto>
-        </Tarjeta>
-      ))}
-
-      {datos.solicitudes_pendientes > datos.solicitudes.length && (
-        <Tarjeta onPress={() => navigation.navigate('Agenda')}>
-          <Texto negrita color={COLORES.azul}>Ver todas en la agenda</Texto>
-        </Tarjeta>
+      ) : (
+        <Lista>
+          {datos.solicitudes.map((c) => (
+            <ItemLista
+              key={c.id_cita}
+              icono="time"
+              colorIcono={COLORES.alerta}
+              fondoIcono={COLORES.alertaFondo}
+              titulo={c.alumno}
+              subtitulo={c.motivo}
+              detalle={`Solicitada el ${formatearFecha(c.fecha_solicitud)}${c.disponibilidad ? ` · ${c.disponibilidad}` : ''}`}
+              onPress={() => abrir(c)}
+            />
+          ))}
+          {datos.solicitudes_pendientes > datos.solicitudes.length && (
+            <ItemLista icono="calendar" titulo="Ver todas en la agenda" onPress={() => navigation.navigate('Agenda')} />
+          )}
+        </Lista>
       )}
     </>
   );

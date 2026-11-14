@@ -1,16 +1,14 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet } from 'react-native';
 import Pantalla from '../../components/Pantalla';
-import Tarjeta from '../../components/Tarjeta';
-import Texto from '../../components/Texto';
 import Boton from '../../components/Boton';
+import Lista, { ItemLista } from '../../components/Lista';
 import { Vacio } from '../../components/Estados';
 import { useSesion } from '../../context/SesionContext';
 import useConsulta from '../../viewmodels/useConsulta';
 import MensajesRepository from '../../repositories/mensajesRepository';
 import { formatearFechaHora } from '../../utils/fechas';
-import { COLORES, ESPACIO, RADIO } from '../../config/tema';
+import { COLORES, ESPACIO } from '../../config/tema';
 
 /**
  * Ícono y pantalla que se abre al tocar cada tipo de notificación.
@@ -28,7 +26,8 @@ const TIPOS = {
 
 /**
  * NotificacionesView: avisos del usuario (nueva tarea, calificación, cita, conducta,
- * mensaje...). Al tocar uno se marca como leído y se abre la pantalla relacionada.
+ * mensaje...). Los no leídos van en negrita con un punto guinda. Al tocar uno se marca
+ * como leído y se abre la pantalla relacionada.
  */
 export default function NotificacionesView({ navigation }) {
   const { usuario, refrescarContadores } = useSesion();
@@ -68,27 +67,28 @@ export default function NotificacionesView({ navigation }) {
             <Boton
               titulo={`Marcar ${datos.no_leidas} como leída(s)`}
               icono="checkmark-done-outline"
-              variante="secundario"
+              variante="texto"
               pequeno
               onPress={leerTodas}
               style={estilos.leerTodas}
             />
           )}
-          {datos.notificaciones.map((n) => (
-            <Tarjeta key={n.id_notificacion} onPress={() => abrir(n)} colorBorde={n.leida ? undefined : COLORES.guinda}>
-              <View style={estilos.fila}>
-                <View style={[estilos.icono, !n.leida && estilos.iconoNuevo]}>
-                  <Ionicons name={`${TIPOS[n.tipo]?.icono || 'notifications'}-outline`} size={20}
-                    color={n.leida ? COLORES.textoSecundario : COLORES.guinda} />
-                </View>
-                <View style={estilos.flex}>
-                  <Texto negrita={!n.leida}>{n.titulo}</Texto>
-                  <Texto variante="pequeno">{n.mensaje}</Texto>
-                  <Texto variante="diminuto">{formatearFechaHora(n.fecha)}</Texto>
-                </View>
-              </View>
-            </Tarjeta>
-          ))}
+          <Lista>
+            {datos.notificaciones.map((n) => (
+              <ItemLista
+                key={n.id_notificacion}
+                icono={`${TIPOS[n.tipo]?.icono || 'notifications'}-outline`}
+                colorIcono={n.leida ? COLORES.textoSecundario : COLORES.guinda}
+                fondoIcono={n.leida ? COLORES.bordeSuave : COLORES.crema}
+                titulo={n.titulo}
+                subtitulo={n.mensaje}
+                detalle={formatearFechaHora(n.fecha)}
+                resaltado={!n.leida}
+                acento={n.leida ? undefined : COLORES.guinda}
+                onPress={() => abrir(n)}
+              />
+            ))}
+          </Lista>
         </>
       ))}
     </Pantalla>
@@ -96,12 +96,5 @@ export default function NotificacionesView({ navigation }) {
 }
 
 const estilos = StyleSheet.create({
-  leerTodas: { alignSelf: 'flex-end', marginBottom: ESPACIO.md },
-  fila: { flexDirection: 'row', gap: ESPACIO.md, alignItems: 'flex-start' },
-  flex: { flex: 1, gap: 2 },
-  icono: {
-    width: 36, height: 36, borderRadius: RADIO.total, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORES.bordeSuave,
-  },
-  iconoNuevo: { backgroundColor: COLORES.crema },
+  leerTodas: { alignSelf: 'flex-end', marginBottom: ESPACIO.xs },
 });

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
-import Tarjeta from '../../components/Tarjeta';
+import Lista, { ItemLista } from '../../components/Lista';
 import Texto from '../../components/Texto';
 import Campo from '../../components/Campo';
 import Selector from '../../components/Selector';
@@ -87,21 +87,23 @@ export default function ReporteAsistenciaView({ navigation }) {
         <>
           {reporte.aviso && <Aviso tono="alerta" icono="cloud-offline">{reporte.aviso}</Aviso>}
           <Seccion titulo={`${reporte.datos.seccion} · ${reporte.datos.alumnos.length} estudiantes`} />
-          {reporte.datos.alumnos.map((a) => (
-            <Tarjeta
-              key={a.id_alumno}
-              colorBorde={a.porcentaje !== null && a.porcentaje < 85 ? COLORES.error : undefined}
-              onPress={() => navigation.navigate('ConductaAlumno', { idAlumno: a.id_alumno, titulo: a.nombres })}
-            >
-              <View style={estilos.fila}>
-                <Texto negrita style={estilos.flex}>{a.apellidos}, {a.nombres}</Texto>
-                <Texto variante="subtitulo" color={COLORES.azul}>{a.porcentaje === null ? '—' : `${a.porcentaje}%`}</Texto>
-              </View>
-              <Texto variante="pequeno">
-                P {a.P} · <Texto variante="pequeno" color={COLORES.alerta}>T {a.T}</Texto> · <Texto variante="pequeno" color={COLORES.error}>F {a.F}</Texto> · J {a.J} · {a.dias} día(s)
-              </Texto>
-            </Tarjeta>
-          ))}
+          <Lista>
+            {reporte.datos.alumnos.map((a) => (
+              <ItemLista
+                key={a.id_alumno}
+                titulo={`${a.apellidos}, ${a.nombres}`}
+                subtitulo={`P ${a.P} · T ${a.T} · F ${a.F} · J ${a.J}`}
+                detalle={`${a.dias} día(s) registrados`}
+                acento={a.porcentaje !== null && a.porcentaje < 85 ? COLORES.error : undefined}
+                derecha={(
+                  <Texto variante="subtitulo" color={a.porcentaje !== null && a.porcentaje < 85 ? COLORES.error : COLORES.azul}>
+                    {a.porcentaje === null ? '—' : `${a.porcentaje}%`}
+                  </Texto>
+                )}
+                onPress={() => navigation.navigate('ConductaAlumno', { idAlumno: a.id_alumno, titulo: a.nombres })}
+              />
+            ))}
+          </Lista>
         </>
       ))}
     </Pantalla>

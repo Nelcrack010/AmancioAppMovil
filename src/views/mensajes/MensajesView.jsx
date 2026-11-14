@@ -1,14 +1,14 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
-import Tarjeta from '../../components/Tarjeta';
 import Texto from '../../components/Texto';
 import Boton from '../../components/Boton';
+import Lista, { ItemLista } from '../../components/Lista';
 import { Avatar } from '../../components/Basicos';
 import { Vacio } from '../../components/Estados';
 import useConsulta from '../../viewmodels/useConsulta';
 import MensajesRepository from '../../repositories/mensajesRepository';
-import { formatearFechaHora } from '../../utils/fechas';
+import { formatearFecha, hoyISO, soloHora } from '../../utils/fechas';
 import { NOMBRES_ROL } from '../../config/estados';
 import { COLORES, ESPACIO, RADIO } from '../../config/tema';
 
@@ -26,38 +26,47 @@ export default function MensajesView({ navigation }) {
     >
       {(lista) => (lista.length === 0 ? (
         <Vacio icono="chatbubbles-outline" titulo="Sin conversaciones" mensaje="Escribe a un docente, auxiliar o a psicología." />
-      ) : lista.map((c) => (
-        <Tarjeta
-          key={c.id_conversacion}
-          onPress={() => navigation.navigate('Chat', { idConversacion: c.id_conversacion, titulo: c.contacto })}
-        >
-          <View style={estilos.fila}>
-            <Avatar nombre={c.contacto} />
-            <View style={estilos.flex}>
-              <Texto negrita numberOfLines={1}>{c.contacto}</Texto>
-              <Texto variante="diminuto">{NOMBRES_ROL[c.rol_contacto]} · {formatearFechaHora(c.fecha_actualizacion)}</Texto>
-              <Texto variante="pequeno" numberOfLines={1} negrita={c.no_leidos > 0}
-                color={c.no_leidos > 0 ? COLORES.texto : COLORES.textoSecundario}>
-                {c.ultimo_mensaje}
-              </Texto>
-            </View>
-            {c.no_leidos > 0 && (
-              <View style={estilos.globo}>
-                <Texto variante="diminuto" negrita color={COLORES.blanco}>{c.no_leidos}</Texto>
-              </View>
-            )}
-          </View>
-        </Tarjeta>
-      )))}
+      ) : (
+        <Lista>
+          {lista.map((c) => (
+            <ItemLista
+              key={c.id_conversacion}
+              izquierda={<Avatar nombre={c.contacto} tamano={42} />}
+              titulo={c.contacto}
+              subtitulo={c.ultimo_mensaje}
+              detalle={NOMBRES_ROL[c.rol_contacto]}
+              resaltado={c.no_leidos > 0}
+              derecha={<HoraYGlobo fecha={c.fecha_actualizacion} noLeidos={c.no_leidos} />}
+              onPress={() => navigation.navigate('Chat', { idConversacion: c.id_conversacion, titulo: c.contacto })}
+            />
+          ))}
+        </Lista>
+      ))}
     </Pantalla>
   );
 }
 
+/** A la derecha de cada conversación: la hora (o la fecha) y el globo de no leídos. */
+function HoraYGlobo({ fecha, noLeidos }) {
+  const esHoy = fecha?.slice(0, 10) === hoyISO();
+  return (
+    <View style={estilos.derecha}>
+      <Texto variante="diminuto" color={noLeidos > 0 ? COLORES.guinda : COLORES.textoSuave}>
+        {esHoy ? soloHora(fecha) : formatearFecha(fecha).replace(/ \d{4}$/, '')}
+      </Texto>
+      {noLeidos > 0 && (
+        <View style={estilos.globo}>
+          <Texto variante="diminuto" negrita color={COLORES.blanco}>{noLeidos}</Texto>
+        </View>
+      )}
+    </View>
+  );
+}
+
 const estilos = StyleSheet.create({
-  fila: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.md },
-  flex: { flex: 1, gap: 2 },
+  derecha: { alignItems: 'flex-end', gap: ESPACIO.xs },
   globo: {
-    minWidth: 22, height: 22, borderRadius: RADIO.total, paddingHorizontal: 6,
+    minWidth: 20, height: 20, borderRadius: RADIO.total, paddingHorizontal: 6,
     backgroundColor: COLORES.guinda, alignItems: 'center', justifyContent: 'center',
   },
 });

@@ -44,7 +44,7 @@ Pantalla (views) → ViewModel (viewmodels) → Repositorio (repositories) → S
 | Capa | Carpeta | Qué hace |
 |---|---|---|
 | Pantallas | `src/views/` | Solo dibujan y capturan eventos. Una carpeta por rol o módulo. |
-| Componentes | `src/components/` | Piezas reutilizables: `Texto`, `Boton`, `Campo`, `Tarjeta`, `Etiqueta`, `Selector`, estados (`Cargando`, `Vacio`, `ErrorVista`, `Aviso`) y la barra de menú (`menu/`). |
+| Componentes | `src/components/` | Piezas reutilizables: `Lista` + `ItemLista` (listas agrupadas, la forma estándar de mostrar listas), `Texto`, `Boton`, `Campo`, `Tarjeta`, `Etiqueta`, `Selector`, estados (`Cargando`, `Vacio`, `ErrorVista`, `Aviso`) y la barra de menú (`menu/`). |
 | ViewModels | `src/viewmodels/` | Estado de la pantalla. `useConsulta` (mostrar datos) y `useAccion` (guardar, enviar) sirven para casi todo; las pantallas complejas tienen el suyo (chat, asistencia, notas). |
 | Repositorios | `src/repositories/` | Única puerta a los datos. Deciden si leer la caché, llamar a la API o dejar la operación pendiente. |
 | Servicio HTTP | `src/services/api/` | Un archivo por módulo de la API. `apiClient.js` agrega el JWT y traduce los errores (400, 401, 403, 404, 409, 500, sin conexión). |

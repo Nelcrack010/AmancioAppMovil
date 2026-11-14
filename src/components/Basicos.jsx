@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Texto from './Texto';
-import { COLORES, ESPACIO, RADIO } from '../config/tema';
+import { COLORES, ESPACIO, RADIO, SOMBRA } from '../config/tema';
 
 /**
  * Componentes pequeños de presentación que se repiten en muchas pantallas.
@@ -52,9 +52,22 @@ export function Dato({ valor, rotulo, color = COLORES.guinda }) {
   );
 }
 
-/** Fila de varios <Dato> repartidos en partes iguales. */
+/**
+ * Varios <Dato> dentro de UNA tarjeta, separados por líneas verticales finas
+ * (más limpio que una caja por número).
+ */
 export function FilaDatos({ children }) {
-  return <View style={estilos.filaDatos}>{children}</View>;
+  const datos = React.Children.toArray(children).filter(Boolean);
+  return (
+    <View style={estilos.filaDatos}>
+      {datos.map((dato, i) => (
+        <React.Fragment key={dato.key ?? i}>
+          {i > 0 && <View style={estilos.divisor} />}
+          {dato}
+        </React.Fragment>
+      ))}
+    </View>
+  );
 }
 
 /** Línea divisoria fina. */
@@ -67,29 +80,29 @@ const estilos = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: ESPACIO.md,
+    marginTop: ESPACIO.lg,
     marginBottom: ESPACIO.sm,
+    paddingHorizontal: ESPACIO.xs,
   },
   fila: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: ESPACIO.md,
-    paddingVertical: ESPACIO.sm,
+    paddingVertical: ESPACIO.sm + 2,
     borderBottomWidth: 1,
-    borderBottomColor: COLORES.bordeSuave,
+    borderBottomColor: COLORES.linea,
   },
   rotulo: { flex: 1 },
   valor: { flex: 1.4, textAlign: 'right' },
   avatar: { borderRadius: RADIO.total, alignItems: 'center', justifyContent: 'center' },
-  dato: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: ESPACIO.md,
+  dato: { flex: 1, alignItems: 'center', paddingVertical: ESPACIO.md, paddingHorizontal: ESPACIO.xs },
+  filaDatos: {
+    flexDirection: 'row',
     backgroundColor: COLORES.superficie,
-    borderRadius: RADIO.md,
-    borderWidth: 1,
-    borderColor: COLORES.bordeSuave,
+    borderRadius: RADIO.lg,
+    marginBottom: ESPACIO.md,
+    ...SOMBRA,
   },
-  filaDatos: { flexDirection: 'row', gap: ESPACIO.sm, marginBottom: ESPACIO.md },
+  divisor: { width: 1, backgroundColor: COLORES.linea, marginVertical: ESPACIO.md },
   separador: { height: 1, backgroundColor: COLORES.borde, marginVertical: ESPACIO.md },
 });

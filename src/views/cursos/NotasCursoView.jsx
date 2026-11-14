@@ -11,7 +11,7 @@ import { Aviso, Cargando } from '../../components/Estados';
 import useNotasCursoViewModel from '../../viewmodels/useNotasCursoViewModel';
 import { avisarResultado, confirmar } from '../../utils/dialogos';
 import { colorNota } from '../../config/estados';
-import { COLORES, ESPACIO, FUENTES, RADIO } from '../../config/tema';
+import { COLORES, ESPACIO, FUENTES, RADIO, SOMBRA } from '../../config/tema';
 
 const BIMESTRES = [1, 2, 3, 4].map((n) => ({ valor: n, texto: `${n}° bim.` }));
 
@@ -98,8 +98,9 @@ export default function NotasCursoView({ route }) {
               <Texto variante="etiqueta" color={COLORES.azul}>{vm.nombreEvaluacion}</Texto>
             )}
           />
-          {datos.alumnos.map((a) => (
-            <View key={a.id_alumno} style={estilos.alumno}>
+          <View style={estilos.listaAlumnos}>
+          {datos.alumnos.map((a, i) => (
+            <View key={a.id_alumno} style={[estilos.alumno, i > 0 && estilos.conLinea]}>
               <View style={estilos.flex}>
                 <Texto negrita>{a.apellidos}, {a.nombres}</Texto>
                 <Texto variante="diminuto">
@@ -127,6 +128,7 @@ export default function NotasCursoView({ route }) {
               )}
             </View>
           ))}
+          </View>
 
           {!datos.cerrado && (
             <View style={estilos.botones}>
@@ -147,17 +149,10 @@ export default function NotasCursoView({ route }) {
 }
 
 const estilos = StyleSheet.create({
-  alumno: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: ESPACIO.md,
-    padding: ESPACIO.md,
-    marginBottom: ESPACIO.sm,
-    backgroundColor: COLORES.superficie,
-    borderRadius: RADIO.md,
-    borderWidth: 1,
-    borderColor: COLORES.bordeSuave,
-  },
+  // Todos los estudiantes en una sola tarjeta, separados por líneas finas.
+  listaAlumnos: { backgroundColor: COLORES.superficie, borderRadius: RADIO.lg, ...SOMBRA },
+  alumno: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.md, padding: ESPACIO.md },
+  conLinea: { borderTopWidth: 1, borderTopColor: COLORES.linea },
   flex: { flex: 1, gap: 2 },
   nota: {
     width: 64,

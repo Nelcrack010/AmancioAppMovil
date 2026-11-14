@@ -20,10 +20,11 @@ export const COLORES = {
   cremaOscuro: '#F8EBDD',
 
   // Fondos y superficies
-  fondo: '#F8FAFC',
+  fondo: '#F4F5F7',          // gris muy claro: hace resaltar las tarjetas blancas
   superficie: '#FFFFFF',
   borde: '#E5E7EB',
-  bordeSuave: '#F1F5F9',
+  bordeSuave: '#F1F3F5',
+  linea: '#ECEEF1',          // separador fino entre filas de una lista
 
   // Texto
   texto: '#111418',
@@ -80,9 +81,9 @@ export const RADIO = {
 
 /** Sombra suave para tarjetas (Android usa elevation; iOS/web, shadow*). */
 export const SOMBRA = {
-  elevation: 2,
-  shadowColor: '#000',
-  shadowOpacity: 0.06,
-  shadowRadius: 6,
-  shadowOffset: { width: 0, height: 2 },
+  elevation: 1,
+  shadowColor: '#0F172A',
+  shadowOpacity: 0.05,
+  shadowRadius: 8,
+  shadowOffset: { width: 0, height: 1 },
 };

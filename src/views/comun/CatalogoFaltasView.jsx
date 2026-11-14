@@ -1,15 +1,13 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
-import Tarjeta from '../../components/Tarjeta';
-import Texto from '../../components/Texto';
+import Lista, { ItemLista } from '../../components/Lista';
 import Etiqueta from '../../components/Etiqueta';
 import { Seccion } from '../../components/Basicos';
 import { Aviso } from '../../components/Estados';
 import useConsulta from '../../viewmodels/useConsulta';
 import ConductaRepository from '../../repositories/conductaRepository';
 import { TIPOS_FALTA } from '../../config/estados';
-import { COLORES, ESPACIO } from '../../config/tema';
 
 /**
  * CatalogoFaltasView: tipos de falta definidos por el colegio, agrupados por gravedad,
@@ -32,15 +30,16 @@ export default function CatalogoFaltasView() {
             {Object.entries(grupos).map(([tipo, faltasDelTipo]) => (
               <View key={tipo}>
                 <Seccion titulo={tipo} />
-                {faltasDelTipo.map((f) => (
-                  <Tarjeta key={f.id_falta}>
-                    <View style={estilos.fila}>
-                      <Texto style={estilos.flex}>{f.nombre}</Texto>
-                      <Etiqueta texto={`−${f.puntos} pts`} tono={TIPOS_FALTA[tipo]?.tono || 'neutro'} />
-                    </View>
-                    {f.descripcion && <Texto variante="pequeno" color={COLORES.textoSecundario}>{f.descripcion}</Texto>}
-                  </Tarjeta>
-                ))}
+                <Lista>
+                  {faltasDelTipo.map((f) => (
+                    <ItemLista
+                      key={f.id_falta}
+                      titulo={f.nombre}
+                      subtitulo={f.descripcion}
+                      derecha={<Etiqueta texto={`−${f.puntos} pts`} tono={TIPOS_FALTA[tipo]?.tono || 'neutro'} />}
+                    />
+                  ))}
+                </Lista>
               </View>
             ))}
           </>
@@ -49,8 +48,3 @@ export default function CatalogoFaltasView() {
     </Pantalla>
   );
 }
-
-const estilos = StyleSheet.create({
-  fila: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.sm },
-  flex: { flex: 1 },
-});

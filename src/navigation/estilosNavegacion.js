@@ -8,6 +8,6 @@ export const OPCIONES_CABECERA = {
   headerStyle: { backgroundColor: COLORES.superficie },
   headerTintColor: COLORES.guinda,              // color de la flecha "volver"
   headerTitleStyle: { fontFamily: FUENTES.negrita, color: COLORES.guinda, fontSize: 18 },
-  headerShadowVisible: true,
+  headerShadowVisible: false,        // cabecera plana: el fondo gris ya la separa del contenido
   contentStyle: { backgroundColor: COLORES.fondo },
 };
