@@ -43,3 +43,4 @@ yarn-error.*
 # Local IDE / Agents
 .claude/
 AGENTS.md
+.env

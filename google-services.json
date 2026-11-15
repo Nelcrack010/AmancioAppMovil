@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "234566453491",
+    "project_id": "amancio-appmovil",
+    "storage_bucket": "amancio-appmovil.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:234566453491:android:548935602ac5f15d8ecf86",
+        "android_client_info": {
+          "package_name": "com.amanciovarona.appmovil"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAG9rgbquGrokzoVWBJSyLvN1VmELSvASU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

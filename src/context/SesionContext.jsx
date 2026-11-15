@@ -1,7 +1,11 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import * as Notifications from 'expo-notifications';
 import { registrarAlExpirarSesion } from '../services/api/apiClient';
 import PerfilApi from '../services/api/perfilApi';
 import SesionRepository from '../repositories/sesionRepository';
+import MensajesRepository from '../repositories/mensajesRepository';
+import { obtenerTokenPushAsync } from '../services/notificacionesPushService';
+import { navigate } from '../navigation/navegacionGlobal';
 
 /**
  * SesionContext: estado global de la sesión, disponible en toda la app con useSesion().
@@ -86,6 +90,60 @@ export function SesionProvider({ children }) {
     refrescarContadores();
     const intervalo = setInterval(refrescarContadores, CADA_DOS_MINUTOS);
     return () => clearInterval(intervalo);
+  }, [sesionLista, refrescarContadores]);
+
+  // --- Registro de token push y listeners de notificaciones ----------------------------
+  const procesandoRespuestaPush = useRef(false);
+
+  useEffect(() => {
+    if (!sesionLista) return undefined;
+
+    // 1. Obtener y registrar el token push en el backend
+    obtenerTokenPushAsync()
+      .then((token) => {
+        if (token) {
+          return MensajesRepository.registrarTokenPush(token);
+        }
+      })
+      .catch(() => {
+        // Fallos de registro no deben interrumpir el uso de la app
+      });
+
+    // 2. Listener cuando llega una notificación con la app en primer plano
+    const suscripcionRecibida = Notifications.addNotificationReceivedListener(() => {
+      refrescarContadores();
+    });
+
+    // Función auxiliar para navegar a NotificacionesView al interactuar con una notificación
+    const manejarRespuestaNotificacion = (response) => {
+      if (!response) return;
+      const data = response.notification?.request?.content?.data || {};
+      const { tipo, id_referencia } = data;
+      refrescarContadores();
+      navigate('Notificaciones', { tipo, id_referencia });
+    };
+
+    // 3. Listener cuando el usuario toca la notificación
+    const suscripcionRespuesta = Notifications.addNotificationResponseReceivedListener(
+      manejarRespuestaNotificacion
+    );
+
+    // 4. Si la app se abrió desde una notificación estando cerrada
+    if (!procesandoRespuestaPush.current) {
+      procesandoRespuestaPush.current = true;
+      Notifications.getLastNotificationResponseAsync()
+        .then((lastResponse) => {
+          if (lastResponse) {
+            manejarRespuestaNotificacion(lastResponse);
+          }
+        })
+        .catch(() => {});
+    }
+
+    return () => {
+      suscripcionRecibida.remove();
+      suscripcionRespuesta.remove();
+    };
   }, [sesionLista, refrescarContadores]);
 
   const valor = useMemo(() => ({

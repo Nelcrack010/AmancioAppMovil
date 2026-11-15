@@ -19,6 +19,7 @@ export const API_CONFIG = {
 export const STORAGE_KEYS = {
   AUTH_TOKEN: 'amancio_auth_token',
   USER_PROFILE: 'amancio_user_profile',
+  PUSH_TOKEN: 'amancio_push_token',
 };
 
 /** Nombre visible de la app (cabeceras, pantalla de acceso). */

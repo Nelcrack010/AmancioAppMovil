@@ -1,4 +1,7 @@
+import { Platform } from 'react-native';
 import MensajesApi from '../services/api/mensajesApi';
+import Almacenamiento from '../services/almacenamiento';
+import { STORAGE_KEYS } from '../config/constants';
 import { fuente } from './cacheRepository';
 import ColaRepository from './colaRepository';
 
@@ -25,6 +28,33 @@ export const MensajesRepository = {
   notificaciones: () => fuente('notificaciones', MensajesApi.notificaciones),
   marcarNotificacionLeida: MensajesApi.marcarNotificacionLeida,
   marcarTodasLeidas: MensajesApi.marcarTodasLeidas,
+
+  // --- Dispositivos Push --------------------------------------------------------------------
+  /** Registra el token push en el backend y lo persiste en almacenamiento seguro. */
+  async registrarTokenPush(token) {
+    if (!token) return;
+    const plataforma = Platform.OS === 'ios' ? 'ios' : 'android';
+    await MensajesApi.registrarDispositivo(token, plataforma);
+    await Almacenamiento.guardar(STORAGE_KEYS.PUSH_TOKEN, token);
+  },
+
+  /** Obtiene el token push guardado en el almacenamiento seguro. */
+  async obtenerTokenPushGuardado() {
+    return Almacenamiento.leer(STORAGE_KEYS.PUSH_TOKEN);
+  },
+
+  /** Desasocia el token push en el backend y lo borra del almacenamiento seguro. */
+  async eliminarTokenPush() {
+    const token = await Almacenamiento.leer(STORAGE_KEYS.PUSH_TOKEN);
+    if (token) {
+      try {
+        await MensajesApi.eliminarDispositivo(token);
+      } catch {
+        // Si falla por red o token inexistente, se continúa con la limpieza local
+      }
+      await Almacenamiento.borrar(STORAGE_KEYS.PUSH_TOKEN);
+    }
+  },
 };
 
 export default MensajesRepository;

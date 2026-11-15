@@ -8,6 +8,7 @@ import {
 import { SesionProvider } from './src/context/SesionContext';
 import { ConexionProvider } from './src/context/ConexionContext';
 import AppNavigator from './src/navigation/AppNavigator';
+import { navigationRef } from './src/navigation/navegacionGlobal';
 import { Cargando } from './src/components/Estados';
 import { COLORES } from './src/config/tema';
 
@@ -44,7 +45,7 @@ export default function App() {
     <SafeAreaProvider>
       <SesionProvider>
         <ConexionProvider>
-          <NavigationContainer theme={TEMA_NAVEGACION} fallback={<Cargando />}>
+          <NavigationContainer ref={navigationRef} theme={TEMA_NAVEGACION} fallback={<Cargando />}>
             <StatusBar style="dark" />
             <AppNavigator />
           </NavigationContainer>

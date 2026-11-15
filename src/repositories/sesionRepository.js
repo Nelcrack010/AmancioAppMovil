@@ -1,6 +1,7 @@
 import Almacenamiento from '../services/almacenamiento';
 import { establecerToken } from '../services/api/apiClient';
 import AuthApi from '../services/api/authApi';
+import MensajesApi from '../services/api/mensajesApi';
 import { STORAGE_KEYS } from '../config/constants';
 import CacheDao from '../database/dao/cacheDao';
 import PendienteDao from '../database/dao/pendienteDao';
@@ -69,16 +70,29 @@ export const SesionRepository = {
    */
   async cerrarSesion({ borrarDatos }) {
     const id = idUsuarioActual();
+    const pushToken = await Almacenamiento.leer(STORAGE_KEYS.PUSH_TOKEN);
+
     if (borrarDatos) {
       try {
-        await AuthApi.logout();
+        await AuthApi.logout(pushToken);
       } catch {
-        // Si no hay red no importa: el token igual se borra del celular.
+        // Si falla por red o token inválido, intentar DELETE explícito si hay pushToken
+        if (pushToken) {
+          try {
+            await MensajesApi.eliminarDispositivo(pushToken);
+          } catch {
+            // Sin conexión o fallo no bloqueante
+          }
+        }
       }
       if (id) {
         await CacheDao.borrarDeUsuario(id);
         await PendienteDao.borrarDeUsuario(id);
       }
+    }
+
+    if (pushToken) {
+      await Almacenamiento.borrar(STORAGE_KEYS.PUSH_TOKEN);
     }
     await Almacenamiento.borrar(STORAGE_KEYS.AUTH_TOKEN);
     await Almacenamiento.borrar(STORAGE_KEYS.USER_PROFILE);

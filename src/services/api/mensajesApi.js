@@ -36,6 +36,15 @@ export const MensajesApi = {
 
   /** PATCH /notificaciones/leer-todas */
   marcarTodasLeidas: async () => (await apiClient.patch('/notificaciones/leer-todas')).data,
+
+  // --- Dispositivos (Push Tokens) -------------------------------------------------------
+  /** POST /dispositivos/token → { token, plataforma } */
+  registrarDispositivo: async (token, plataforma) =>
+    (await apiClient.post('/dispositivos/token', { token, plataforma })).data,
+
+  /** DELETE /dispositivos/token → body: { token } */
+  eliminarDispositivo: async (token) =>
+    (await apiClient.delete('/dispositivos/token', { data: { token } })).data,
 };
 
 export default MensajesApi;
