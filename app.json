@@ -32,7 +32,8 @@
           "color": "#1E40AF",
           "defaultChannel": "default"
         }
-      ]
+      ],
+      "expo-status-bar"
     ],
     "extra": {
       "eas": {
