@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+﻿import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import * as Notifications from 'expo-notifications';
 import { registrarAlExpirarSesion } from '../services/api/apiClient';
 import PerfilApi from '../services/api/perfilApi';
@@ -98,51 +98,82 @@ export function SesionProvider({ children }) {
   useEffect(() => {
     if (!sesionLista) return undefined;
 
-    // 1. Obtener y registrar el token push en el backend
-    obtenerTokenPushAsync()
-      .then((token) => {
-        if (token) {
-          return MensajesRepository.registrarTokenPush(token);
-        }
-      })
-      .catch(() => {
-        // Fallos de registro no deben interrumpir el uso de la app
-      });
+    let suscripcionRecibida = null;
+    let suscripcionRespuesta = null;
 
-    // 2. Listener cuando llega una notificación con la app en primer plano
-    const suscripcionRecibida = Notifications.addNotificationReceivedListener(() => {
-      refrescarContadores();
-    });
-
-    // Función auxiliar para navegar a NotificacionesView al interactuar con una notificación
-    const manejarRespuestaNotificacion = (response) => {
-      if (!response) return;
-      const data = response.notification?.request?.content?.data || {};
-      const { tipo, id_referencia } = data;
-      refrescarContadores();
-      navigate('Notificaciones', { tipo, id_referencia });
-    };
-
-    // 3. Listener cuando el usuario toca la notificación
-    const suscripcionRespuesta = Notifications.addNotificationResponseReceivedListener(
-      manejarRespuestaNotificacion
-    );
-
-    // 4. Si la app se abrió desde una notificación estando cerrada
-    if (!procesandoRespuestaPush.current) {
-      procesandoRespuestaPush.current = true;
-      Notifications.getLastNotificationResponseAsync()
-        .then((lastResponse) => {
-          if (lastResponse) {
-            manejarRespuestaNotificacion(lastResponse);
+    try {
+      // 1. Obtener y registrar el token push en el backend
+      obtenerTokenPushAsync()
+        .then((token) => {
+          if (token) {
+            return MensajesRepository.registrarTokenPush(token);
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          // Fallos de registro no deben interrumpir el uso de la app
+        });
+
+      // 2. Listener cuando llega una notificación con la app en primer plano
+      try {
+        suscripcionRecibida = Notifications.addNotificationReceivedListener(() => {
+          try {
+            refrescarContadores();
+          } catch {
+            // No romper si falla refrescar contadores
+          }
+        });
+      } catch {
+        // Ignorar si el listener no puede agregarse
+      }
+
+      // Función auxiliar para navegar a NotificacionesView al interactuar con una notificación
+      const manejarRespuestaNotificacion = (response) => {
+        try {
+          if (!response) return;
+          const data = response.notification?.request?.content?.data || {};
+          const { tipo, id_referencia } = data;
+          refrescarContadores();
+          navigate('Notificaciones', { tipo, id_referencia });
+        } catch {
+          // Si falla la navegación o los contadores, no detener la app
+        }
+      };
+
+      // 3. Listener cuando el usuario toca la notificación
+      try {
+        suscripcionRespuesta = Notifications.addNotificationResponseReceivedListener(
+          manejarRespuestaNotificacion
+        );
+      } catch {
+        // Ignorar si el listener no puede agregarse
+      }
+
+      // 4. Si la app se abrió desde una notificación estando cerrada
+      if (!procesandoRespuestaPush.current) {
+        procesandoRespuestaPush.current = true;
+        try {
+          Notifications.getLastNotificationResponseAsync()
+            .then((lastResponse) => {
+              if (lastResponse) {
+                manejarRespuestaNotificacion(lastResponse);
+              }
+            })
+            .catch(() => {});
+        } catch {
+          // Ignorar si falla la llamada
+        }
+      }
+    } catch {
+      // Cualquier fallo en el setup de notificaciones es completamente silencioso
     }
 
     return () => {
-      suscripcionRecibida.remove();
-      suscripcionRespuesta.remove();
+      try {
+        if (suscripcionRecibida) suscripcionRecibida.remove();
+        if (suscripcionRespuesta) suscripcionRespuesta.remove();
+      } catch {
+        // Ignorar en cleanup
+      }
     };
   }, [sesionLista, refrescarContadores]);
 
