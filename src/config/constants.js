@@ -7,7 +7,7 @@
  *   - Si no está definida, se usa el servidor del equipo en Oracle Cloud.
  */
 export const API_CONFIG = {
-  BASE_URL: 'https://146.181.54.237',
+  BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'https://146.181.54.237',
   TIMEOUT_MS: 15000,
   HEADERS: {
     'Content-Type': 'application/json',
