@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import Pantalla from '../../components/Pantalla';
 import Tarjeta from '../../components/Tarjeta';
 import Texto from '../../components/Texto';
@@ -9,6 +9,7 @@ import { Fila, Seccion } from '../../components/Basicos';
 import { Aviso } from '../../components/Estados';
 import { BotonEnlace } from '../../components/Items';
 import useAccion from '../../viewmodels/useAccion';
+import useConsulta from '../../viewmodels/useConsulta';
 import AcademicoRepository from '../../repositories/academicoRepository';
 import { avisarResultado } from '../../utils/dialogos';
 import { formatearFechaHora } from '../../utils/fechas';
@@ -17,20 +18,19 @@ import { ESTADOS_TAREA, infoEstado } from '../../config/estados';
 import { COLORES } from '../../config/tema';
 
 /**
- * TareaDetalleView (estudiante): detalle de una tarea, su entrega y su calificación.
- *
- * La entrega es un ENLACE al trabajo (Drive, OneDrive, YouTube...), que es lo que acepta
- * la API actual. Se puede reenviar mientras no esté calificada. Funciona sin conexión:
- * la entrega queda pendiente y se envía sola al volver la red.
- *
- * params: { tarea, idCarga }
+ * Contenido principal de la tarea una vez que sus datos están cargados.
  */
-export default function TareaDetalleView({ navigation, route }) {
-  const { tarea } = route.params;
+function ContenidoTareaDetalle({ tarea, navigation }) {
   const accion = useAccion();
   const [enlace, setEnlace] = useState(tarea.archivo_url || '');
   const [comentario, setComentario] = useState('');
   const [errorLocal, setErrorLocal] = useState(null);
+
+  useLayoutEffect(() => {
+    if (tarea?.titulo) {
+      navigation.setOptions({ title: tarea.titulo });
+    }
+  }, [navigation, tarea?.titulo]);
 
   const estado = infoEstado(ESTADOS_TAREA, tarea.estado);
   const calificada = tarea.estado === 'CALIFICADA';
@@ -111,4 +111,26 @@ export default function TareaDetalleView({ navigation, route }) {
       )}
     </Pantalla>
   );
+}
+
+/**
+ * TareaDetalleView (estudiante): detalle de una tarea, su entrega y su calificación.
+ * Admite ser abierta con el objeto completo `tarea` o solo con `idTarea` / `id` (deep linking o push).
+ */
+export default function TareaDetalleView({ navigation, route }) {
+  const tareaParam = route.params?.tarea;
+  const idTarea = route.params?.idTarea || route.params?.id || tareaParam?.id_tarea;
+
+  const consulta = useConsulta(
+    () => (!tareaParam && idTarea ? AcademicoRepository.tarea(idTarea) : null),
+    [idTarea, tareaParam]
+  );
+
+  const tarea = tareaParam || consulta.datos?.tarea;
+
+  if (!tarea) {
+    return <Pantalla consulta={consulta} />;
+  }
+
+  return <ContenidoTareaDetalle tarea={tarea} navigation={navigation} />;
 }

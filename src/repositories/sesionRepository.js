@@ -21,6 +21,11 @@ export function idUsuarioActual() {
   return usuarioActual?.id_usuario ?? null;
 }
 
+/** Devuelve los datos básicos del usuario en memoria (incluye rol). */
+export function usuarioEnMemoria() {
+  return usuarioActual;
+}
+
 async function guardarSesion(token, usuario) {
   await Almacenamiento.guardar(STORAGE_KEYS.AUTH_TOKEN, token);
   await Almacenamiento.guardar(STORAGE_KEYS.USER_PROFILE, JSON.stringify(usuario));

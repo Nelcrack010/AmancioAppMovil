@@ -5,7 +5,6 @@ import PerfilApi from '../services/api/perfilApi';
 import SesionRepository from '../repositories/sesionRepository';
 import MensajesRepository from '../repositories/mensajesRepository';
 import { obtenerTokenPushAsync } from '../services/notificacionesPushService';
-import { navigate } from '../navigation/navegacionGlobal';
 
 /**
  * SesionContext: estado global de la sesión, disponible en toda la app con useSesion().
@@ -92,14 +91,11 @@ export function SesionProvider({ children }) {
     return () => clearInterval(intervalo);
   }, [sesionLista, refrescarContadores]);
 
-  // --- Registro de token push y listeners de notificaciones ----------------------------
-  const procesandoRespuestaPush = useRef(false);
-
+  // --- Registro de token push y listener de notificaciones en tiempo real ------------
   useEffect(() => {
     if (!sesionLista) return undefined;
 
     let suscripcionRecibida = null;
-    let suscripcionRespuesta = null;
 
     try {
       // 1. Obtener y registrar el token push en el backend
@@ -113,7 +109,9 @@ export function SesionProvider({ children }) {
           // Fallos de registro no deben interrumpir el uso de la app
         });
 
-      // 2. Listener cuando llega una notificación con la app en primer plano
+      // 2. Listener cuando llega una notificación con la app en primer plano:
+      // actualiza los contadores de avisos y mensajes en tiempo real.
+      // (La navegación al tocar una notificación se gestiona exclusivamente en linking de App.jsx)
       try {
         suscripcionRecibida = Notifications.addNotificationReceivedListener(() => {
           try {
@@ -125,44 +123,6 @@ export function SesionProvider({ children }) {
       } catch {
         // Ignorar si el listener no puede agregarse
       }
-
-      // Función auxiliar para navegar a NotificacionesView al interactuar con una notificación
-      const manejarRespuestaNotificacion = (response) => {
-        try {
-          if (!response) return;
-          const data = response.notification?.request?.content?.data || {};
-          const { tipo, id_referencia } = data;
-          refrescarContadores();
-          navigate('Notificaciones', { tipo, id_referencia });
-        } catch {
-          // Si falla la navegación o los contadores, no detener la app
-        }
-      };
-
-      // 3. Listener cuando el usuario toca la notificación
-      try {
-        suscripcionRespuesta = Notifications.addNotificationResponseReceivedListener(
-          manejarRespuestaNotificacion
-        );
-      } catch {
-        // Ignorar si el listener no puede agregarse
-      }
-
-      // 4. Si la app se abrió desde una notificación estando cerrada
-      if (!procesandoRespuestaPush.current) {
-        procesandoRespuestaPush.current = true;
-        try {
-          Notifications.getLastNotificationResponseAsync()
-            .then((lastResponse) => {
-              if (lastResponse) {
-                manejarRespuestaNotificacion(lastResponse);
-              }
-            })
-            .catch(() => {});
-        } catch {
-          // Ignorar si falla la llamada
-        }
-      }
     } catch {
       // Cualquier fallo en el setup de notificaciones es completamente silencioso
     }
@@ -170,7 +130,6 @@ export function SesionProvider({ children }) {
     return () => {
       try {
         if (suscripcionRecibida) suscripcionRecibida.remove();
-        if (suscripcionRespuesta) suscripcionRespuesta.remove();
       } catch {
         // Ignorar en cleanup
       }

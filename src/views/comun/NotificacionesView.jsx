@@ -9,20 +9,7 @@ import useConsulta from '../../viewmodels/useConsulta';
 import MensajesRepository from '../../repositories/mensajesRepository';
 import { formatearFechaHora } from '../../utils/fechas';
 import { COLORES, ESPACIO } from '../../config/tema';
-
-/**
- * Ícono y pantalla que se abre al tocar cada tipo de notificación.
- * `destino(n, rol)` devuelve [pantalla, params] o null si no abre nada.
- */
-const TIPOS = {
-  TAREA: { icono: 'document-text', destino: () => ['Cursos'] },
-  CALIFICACION: { icono: 'star', destino: () => ['Cursos'] },
-  CLASE: { icono: 'videocam', destino: () => ['Cursos'] },
-  LIBRETA: { icono: 'ribbon', destino: () => ['MisNotas'] },
-  CITA: { icono: 'heart', destino: (n, rol) => [rol === 'PSICOLOGO' ? 'Agenda' : 'MisCitas'] },
-  CONDUCTA: { icono: 'shield', destino: (n, rol) => (rol === 'ALUMNO' ? ['MiConducta'] : null) },
-  MENSAJE: { icono: 'chatbubble', destino: (n) => (n.id_referencia ? ['Chat', { idConversacion: n.id_referencia }] : ['Mensajes']) },
-};
+import { obtenerDestinoNotificacion, TIPOS_NOTIFICACION } from '../../navigation/destinosNotificaciones';
 
 /**
  * NotificacionesView: avisos del usuario (nueva tarea, calificación, cita, conducta,
@@ -42,9 +29,12 @@ export default function NotificacionesView({ navigation }) {
         // si falla (sin red), igual se abre la pantalla
       }
     }
-    const destino = TIPOS[n.tipo]?.destino(n, usuario.rol);
-    if (destino) navigation.navigate(...destino);
-    else consulta.recargar();
+    const destino = obtenerDestinoNotificacion(n, usuario?.rol);
+    if (destino && destino[0] !== 'Notificaciones') {
+      navigation.navigate(...destino);
+    } else {
+      consulta.recargar();
+    }
   };
 
   const leerTodas = async () => {
@@ -77,7 +67,7 @@ export default function NotificacionesView({ navigation }) {
             {datos.notificaciones.map((n) => (
               <ItemLista
                 key={n.id_notificacion}
-                icono={`${TIPOS[n.tipo]?.icono || 'notifications'}-outline`}
+                icono={`${TIPOS_NOTIFICACION[n.tipo]?.icono || 'notifications'}-outline`}
                 colorIcono={n.leida ? COLORES.textoSecundario : COLORES.guinda}
                 fondoIcono={n.leida ? COLORES.bordeSuave : COLORES.crema}
                 titulo={n.titulo}

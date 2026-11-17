@@ -23,6 +23,7 @@ export const AcademicoRepository = {
   materiales: (idCarga) => fuente(`materiales:${idCarga}`, () => CursosApi.materiales(idCarga)),
   clases: (idCarga) => fuente(`clases:${idCarga}`, () => CursosApi.clases(idCarga)),
   tareas: (idCarga) => fuente(`tareas:${idCarga}`, () => CursosApi.tareas(idCarga)),
+  tarea: (idTarea) => fuente(`tarea:${idTarea}`, () => CursosApi.tarea(idTarea)),
   entregas: (idTarea) => fuente(`entregas:${idTarea}`, () => CursosApi.entregas(idTarea)),
   misNotas: (bimestre) => fuente(`mis-notas:${bimestre}`, () => NotasApi.misNotas(bimestre)),
   miLibreta: () => fuente('mi-libreta', NotasApi.miLibreta),

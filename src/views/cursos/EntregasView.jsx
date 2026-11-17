@@ -21,8 +21,8 @@ import { COLORES, ESPACIO } from '../../config/tema';
  * params: { idTarea }
  */
 export default function EntregasView({ navigation, route }) {
-  const { idTarea } = route.params;
-  const entregas = useConsulta(() => AcademicoRepository.entregas(idTarea), [idTarea]);
+  const idTarea = route.params?.idTarea || route.params?.id;
+  const entregas = useConsulta(() => (idTarea ? AcademicoRepository.entregas(idTarea) : null), [idTarea]);
   const [filtro, setFiltro] = useState('TODAS');
 
   return (

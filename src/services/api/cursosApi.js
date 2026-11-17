@@ -26,6 +26,7 @@ export const CursosApi = {
   eliminarClase: async (idClase) => (await apiClient.delete(`/clases/item/${idClase}`)).data,
 
   // --- Tareas ----------------------------------------------------------------------
+  tarea: async (idTarea) => (await apiClient.get(`/tareas/item/${idTarea}`)).data,
   tareas: async (idCarga) => (await apiClient.get(`/tareas/${idCarga}`)).data,
   publicarTarea: async (idCarga, datos) => (await apiClient.post(`/tareas/${idCarga}`, datos)).data,
   eliminarTarea: async (idTarea) => (await apiClient.delete(`/tareas/item/${idTarea}`)).data,

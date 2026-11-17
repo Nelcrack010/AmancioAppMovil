@@ -2,6 +2,7 @@
   "expo": {
     "name": "AmancioAppMovil",
     "slug": "AmancioAppMovil",
+    "scheme": "amancioapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
