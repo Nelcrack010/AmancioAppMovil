@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { API_CONFIG } from '../../config/constants';
+import { API_CONFIG, STORAGE_KEYS } from '../../config/constants';
+import Almacenamiento from '../almacenamiento';
 
 /**
  * Cliente HTTP (Axios) de la API del campus. Equivale a la instancia de Retrofit en Android.
@@ -23,6 +24,10 @@ let alExpirar = null;
 
 export function establecerToken(token) {
   tokenActual = token;
+}
+
+export function obtenerToken() {
+  return tokenActual;
 }
 
 /** El SesionContext registra aquí qué hacer cuando el servidor dice que el token venció. */
@@ -59,7 +64,17 @@ const MENSAJES_HTTP = {
 };
 
 // --- 1. Interceptor de petición: agrega el JWT ----------------------------------------
-apiClient.interceptors.request.use((config) => {
+apiClient.interceptors.request.use(async (config) => {
+  if (!tokenActual) {
+    try {
+      const guardado = await Almacenamiento.leer(STORAGE_KEYS.AUTH_TOKEN);
+      if (guardado) {
+        tokenActual = guardado;
+      }
+    } catch {
+      // Ignorar error de lectura
+    }
+  }
   if (tokenActual) {
     config.headers.Authorization = `Bearer ${tokenActual}`;
   }

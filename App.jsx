@@ -14,6 +14,7 @@ import { navigationRef } from './src/navigation/navegacionGlobal';
 import { Cargando } from './src/components/Estados';
 import { COLORES } from './src/config/tema';
 import MensajesRepository from './src/repositories/mensajesRepository';
+import SesionRepository from './src/repositories/sesionRepository';
 import { urlDesdeNotificacion } from './src/navigation/destinosNotificaciones';
 
 /**
@@ -51,10 +52,12 @@ const LINKING_CONFIG = {
       const response = await Notifications.getLastNotificationResponseAsync();
       const data = response?.notification?.request?.content?.data;
       if (data) {
-        if (data.id_notificacion) {
+        // Asegura que la sesión esté recuperada y el token JWT cargado en apiClient antes del PATCH
+        const usuario = await SesionRepository.recuperarSesion();
+        if (usuario && data.id_notificacion) {
           MensajesRepository.marcarNotificacionLeida(data.id_notificacion).catch(() => {});
         }
-        const url = urlDesdeNotificacion(data);
+        const url = urlDesdeNotificacion(data, usuario?.rol);
         if (url) return url;
       }
     } catch {
@@ -72,14 +75,15 @@ const LINKING_CONFIG = {
     // 2. Escuchar cuando el usuario toca una notificación push (app en segundo plano)
     let notificationSubscription = null;
     try {
-      notificationSubscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      notificationSubscription = Notifications.addNotificationResponseReceivedListener(async (response) => {
         try {
           const data = response?.notification?.request?.content?.data;
           if (data) {
-            if (data.id_notificacion) {
+            const usuario = await SesionRepository.recuperarSesion();
+            if (usuario && data.id_notificacion) {
               MensajesRepository.marcarNotificacionLeida(data.id_notificacion).catch(() => {});
             }
-            const url = urlDesdeNotificacion(data);
+            const url = urlDesdeNotificacion(data, usuario?.rol);
             if (url) listener(url);
           }
         } catch {
@@ -96,10 +100,12 @@ const LINKING_CONFIG = {
     };
   },
   config: {
+    initialRouteName: 'Menu',
     screens: {
       Login: 'login',
       PrimerIngreso: 'primer-ingreso',
       Menu: {
+        initialRouteName: 'Inicio',
         screens: {
           Inicio: 'inicio',
           Cursos: 'cursos',

@@ -51,7 +51,11 @@ function ContenidoTareaDetalle({ tarea, navigation }) {
     ));
     if (r.ok) {
       avisarResultado(r.resultado, yaEntrego ? 'Tu entrega fue reemplazada.' : 'Tu tarea fue entregada.');
-      navigation.goBack();
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Menu');
+      }
     }
   };
 

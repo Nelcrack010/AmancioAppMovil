@@ -34,7 +34,11 @@ export default function SolicitarCitaView({ navigation }) {
     }));
     if (r.ok) {
       avisarResultado(r.resultado, 'Tu solicitud fue enviada. Recibirás un aviso cuando se programe.');
-      navigation.goBack();
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Menu');
+      }
     }
   };
 

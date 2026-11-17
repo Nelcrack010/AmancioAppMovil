@@ -39,7 +39,11 @@ export default function CalificarEntregaView({ navigation, route }) {
     }));
     if (r.ok) {
       avisar('Entrega calificada', `${alumno.nombres} recibirá un aviso con su nota.`);
-      navigation.goBack();
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Menu');
+      }
     }
   };
 

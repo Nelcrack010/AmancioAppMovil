@@ -68,7 +68,11 @@ export default function PublicarView({ navigation, route }) {
     const r = await accion.ejecutar(() => enviar());
     if (r.ok) {
       avisar('Listo', editando ? 'Los cambios se guardaron.' : 'Se publicó correctamente. Los estudiantes recibirán un aviso.');
-      navigation.goBack();
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Menu');
+      }
     }
   };
 

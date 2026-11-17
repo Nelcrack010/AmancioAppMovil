@@ -1,5 +1,5 @@
 import Almacenamiento from '../services/almacenamiento';
-import { establecerToken } from '../services/api/apiClient';
+import { establecerToken, obtenerToken } from '../services/api/apiClient';
 import AuthApi from '../services/api/authApi';
 import MensajesApi from '../services/api/mensajesApi';
 import { STORAGE_KEYS } from '../config/constants';
@@ -15,6 +15,7 @@ import PendienteDao from '../database/dao/pendienteDao';
 
 // Usuario de la sesión actual en memoria: { id_usuario, username, rol, debe_cambiar_password }
 let usuarioActual = null;
+let promesaRecuperacion = null;
 
 /** Lo usan los demás repositorios para separar la caché de cada usuario. */
 export function idUsuarioActual() {
@@ -27,6 +28,7 @@ export function usuarioEnMemoria() {
 }
 
 async function guardarSesion(token, usuario) {
+  promesaRecuperacion = null;
   await Almacenamiento.guardar(STORAGE_KEYS.AUTH_TOKEN, token);
   await Almacenamiento.guardar(STORAGE_KEYS.USER_PROFILE, JSON.stringify(usuario));
   establecerToken(token);
@@ -49,12 +51,28 @@ export const SesionRepository = {
 
   /** Recupera la sesión guardada al abrir la app (o null si no había). */
   async recuperarSesion() {
-    const token = await Almacenamiento.leer(STORAGE_KEYS.AUTH_TOKEN);
-    const texto = await Almacenamiento.leer(STORAGE_KEYS.USER_PROFILE);
-    if (!token || !texto) return null;
-    establecerToken(token);
-    usuarioActual = JSON.parse(texto);
-    return usuarioActual;
+    if (usuarioActual && obtenerToken()) {
+      return usuarioActual;
+    }
+    if (!promesaRecuperacion) {
+      promesaRecuperacion = (async () => {
+        try {
+          const token = await Almacenamiento.leer(STORAGE_KEYS.AUTH_TOKEN);
+          const texto = await Almacenamiento.leer(STORAGE_KEYS.USER_PROFILE);
+          if (!token || !texto) {
+            promesaRecuperacion = null;
+            return null;
+          }
+          establecerToken(token);
+          usuarioActual = JSON.parse(texto);
+          return usuarioActual;
+        } catch {
+          promesaRecuperacion = null;
+          return null;
+        }
+      })();
+    }
+    return promesaRecuperacion;
   },
 
   /** Cambia la contraseña y quita la marca de "primer ingreso". */
@@ -67,11 +85,11 @@ export const SesionRepository = {
   },
 
   /**
-   * Cierra la sesión.
-   *  - borrarDatos = true  (el usuario tocó "Cerrar sesión"): se borra la caché y la cola
-   *    de pendientes para no dejar información académica en el celular.
-   *  - borrarDatos = false (el token venció): se conserva todo para no perder el trabajo
-   *    hecho sin conexión; se enviará cuando vuelva a iniciar sesión.
+   * Cierra la sesión del usuario.
+   *
+   *   borrarDatos: true  → manual ("Cerrar sesión"): borra token, desasocia push, limpia BD
+   *   borrarDatos: false → sesión vencida (401): solo borra el token; deja las operaciones
+   *                        pendientes para que se envíen al volver a entrar
    */
   async cerrarSesion({ borrarDatos }) {
     const id = idUsuarioActual();
@@ -101,9 +119,16 @@ export const SesionRepository = {
     }
     await Almacenamiento.borrar(STORAGE_KEYS.AUTH_TOKEN);
     await Almacenamiento.borrar(STORAGE_KEYS.USER_PROFILE);
+    promesaRecuperacion = null;
     establecerToken(null);
     usuarioActual = null;
   },
 };
+
+/** Espera a que la sesión esté recuperada y el token JWT listo en apiClient. */
+export async function esperarTokenSesion() {
+  const usuario = await SesionRepository.recuperarSesion();
+  return usuario ? obtenerToken() : null;
+}
 
 export default SesionRepository;

@@ -48,7 +48,11 @@ export default function EditarPerfilView({ navigation, route }) {
     });
     if (r.ok) {
       avisar('Datos actualizados', 'Tus datos se guardaron correctamente.');
-      navigation.goBack();
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Menu');
+      }
     }
   };
 

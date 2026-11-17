@@ -39,7 +39,11 @@ export default function CitaDetalleView({ navigation, route }) {
   /** Ejecuta una acción, avisa y vuelve a la agenda. */
   const terminar = (mensaje) => {
     avisar('Listo', mensaje);
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('Menu');
+    }
   };
 
   const programar = async () => {

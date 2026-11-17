@@ -1,5 +1,7 @@
 import React from 'react';
+import { Pressable } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 import { useSesion } from '../context/SesionContext';
 import { Cargando } from '../components/Estados';
 import LoginView from '../views/auth/LoginView';
@@ -7,6 +9,7 @@ import CambiarPasswordView from '../views/auth/CambiarPasswordView';
 import MenuNavigator from './MenuNavigator';
 import { OPCIONES_CABECERA } from './estilosNavegacion';
 import { PANTALLAS_DETALLE } from './pantallas';
+import { COLORES } from '../config/tema';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,7 +28,7 @@ export default function AppNavigator() {
   if (recuperando) return <Cargando mensaje="Recuperando tu sesión..." />;
 
   return (
-    <Stack.Navigator screenOptions={OPCIONES_CABECERA}>
+    <Stack.Navigator initialRouteName="Menu" screenOptions={OPCIONES_CABECERA}>
       {!usuario ? (
         <Stack.Screen name="Login" component={LoginView} options={{ headerShown: false }} />
       ) : usuario.debe_cambiar_password ? (
@@ -43,7 +46,20 @@ export default function AppNavigator() {
               key={nombre}
               name={nombre}
               component={componente}
-              options={({ route }) => ({ title: route.params?.titulo || titulo })}
+              options={({ navigation, route }) => ({
+                title: route.params?.titulo || titulo,
+                headerLeft: () => (
+                  <Pressable
+                    onPress={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Menu'))}
+                    style={{ marginRight: 16, padding: 4 }}
+                    accessibilityRole="button"
+                    accessibilityLabel="Volver"
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    <Ionicons name="arrow-back" size={24} color={COLORES.guinda} />
+                  </Pressable>
+                ),
+              })}
             />
           ))}
         </>

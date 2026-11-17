@@ -43,7 +43,13 @@ export default function CambiarPasswordView({ navigation, route }) {
     if (!r.ok) return;
     avisar('Contraseña actualizada', 'Tu contraseña se cambió correctamente.');
     // En el primer ingreso, AppNavigator abre el campus solo; desde el perfil, se vuelve atrás.
-    if (!obligatorio) navigation.goBack();
+    if (!obligatorio) {
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Menu');
+      }
+    }
   };
 
   return (

@@ -55,7 +55,11 @@ export default function RegistrarReporteView({ navigation, route }) {
     }, `Reporte de conducta: ${nombre} (${falta.nombre})`));
     if (r.ok) {
       avisarResultado(r.resultado, 'El reporte fue registrado. El estudiante recibirá un aviso.');
-      navigation.goBack();
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Menu');
+      }
     }
   };
 
