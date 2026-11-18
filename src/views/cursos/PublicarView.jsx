@@ -7,6 +7,7 @@ import Campo from '../../components/Campo';
 import Boton from '../../components/Boton';
 import Selector from '../../components/Selector';
 import { Aviso } from '../../components/Estados';
+import { SelectorArchivo } from '../../components/Archivos';
 import useAccion from '../../viewmodels/useAccion';
 import useConsulta from '../../viewmodels/useConsulta';
 import AcademicoRepository from '../../repositories/academicoRepository';
@@ -41,6 +42,7 @@ export default function PublicarView({ navigation, route }) {
   const [fecha, setFecha] = useState(fechaItem ? fechaItem.slice(0, 10) : sumarDias(hoyISO(), 7));
   const [hora, setHora] = useState(fechaItem ? fechaItem.slice(11, 16) : (tipo === 'tarea' ? '23:59' : '16:00'));
   const [bimestre, setBimestre] = useState(item?.bimestre || null);
+  const [archivo, setArchivo] = useState(null);     // enunciado de la tarea (PDF, Word...)
   const [errorLocal, setErrorLocal] = useState(null);
 
   // Por defecto, el bimestre en curso según las fechas del año escolar.
@@ -83,7 +85,7 @@ export default function PublicarView({ navigation, route }) {
       return AcademicoRepository.publicarTarea(idCarga, {
         titulo: titulo.trim(), descripcion: descripcion.trim() || null,
         fecha_entrega: unirFechaHora(fecha, hora), bimestre, archivo_url: url,
-      });
+      }, archivo);
     }
     if (tipo === 'material') {
       const datos = { titulo: titulo.trim(), descripcion: descripcion.trim() || null, bimestre, archivo_url: url };
@@ -124,6 +126,10 @@ export default function PublicarView({ navigation, route }) {
             />
             <Campo style={estilos.hora} etiqueta="Hora" valor={hora} alCambiar={setHora} placeholder="HH:MM" maxLength={5} />
           </View>
+        )}
+
+        {tipo === 'tarea' && !editando && (
+          <SelectorArchivo archivo={archivo} alCambiar={setArchivo} etiqueta="Archivo del enunciado (opcional)" />
         )}
 
         <Campo

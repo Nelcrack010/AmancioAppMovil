@@ -8,6 +8,7 @@ import Boton from '../../components/Boton';
 import { Fila, Seccion } from '../../components/Basicos';
 import { Aviso } from '../../components/Estados';
 import { BotonEnlace } from '../../components/Items';
+import { BotonArchivo, SelectorArchivo } from '../../components/Archivos';
 import useAccion from '../../viewmodels/useAccion';
 import useConsulta from '../../viewmodels/useConsulta';
 import AcademicoRepository from '../../repositories/academicoRepository';
@@ -22,6 +23,7 @@ import { COLORES } from '../../config/tema';
  */
 function ContenidoTareaDetalle({ tarea, navigation }) {
   const accion = useAccion();
+  const [archivo, setArchivo] = useState(null);       // archivo elegido para subir
   const [enlace, setEnlace] = useState(tarea.archivo_url || '');
   const [comentario, setComentario] = useState('');
   const [errorLocal, setErrorLocal] = useState(null);
@@ -36,9 +38,11 @@ function ContenidoTareaDetalle({ tarea, navigation }) {
   const calificada = tarea.estado === 'CALIFICADA';
   const yaEntrego = Boolean(tarea.id_entrega);
 
+  // Se entrega con un ARCHIVO y/o un ENLACE (al menos uno de los dos).
   const entregar = async () => {
     const error = primerError(
-      validarEnlace(enlace, 'el enlace de tu trabajo', { requerido: true }),
+      !archivo && !enlace.trim() ? 'Sube un archivo o pega el enlace de tu trabajo.' : null,
+      validarEnlace(enlace, 'el enlace de tu trabajo'),
       validarTexto(comentario, 'el comentario', { minimo: 0, maximo: 1000 }),
     );
     setErrorLocal(error);
@@ -46,8 +50,9 @@ function ContenidoTareaDetalle({ tarea, navigation }) {
 
     const r = await accion.ejecutar(() => AcademicoRepository.entregarTarea(
       tarea.id_tarea,
-      { archivo_url: enlace.trim(), comentario: comentario.trim() || null },
+      { archivo_url: enlace.trim() || null, comentario: comentario.trim() || null },
       `Entrega: ${tarea.titulo}`,
+      archivo,
     ));
     if (r.ok) {
       avisarResultado(r.resultado, yaEntrego ? 'Tu entrega fue reemplazada.' : 'Tu tarea fue entregada.');
@@ -67,6 +72,7 @@ function ContenidoTareaDetalle({ tarea, navigation }) {
         {tarea.descripcion && <Texto>{tarea.descripcion}</Texto>}
         <Fila rotulo="Fecha de entrega" valor={formatearFechaHora(tarea.fecha_entrega)} />
         <Fila rotulo="Bimestre" valor={`${tarea.bimestre}°`} />
+        <BotonArchivo archivo={tarea.adjunto} texto="Enunciado" />
         <BotonEnlace texto="Ver enunciado" icono="document-attach-outline" url={tarea.archivo_adjunto_url} />
       </Tarjeta>
 
@@ -76,7 +82,8 @@ function ContenidoTareaDetalle({ tarea, navigation }) {
           <Tarjeta colorBorde={calificada ? COLORES.exito : COLORES.azul}>
             <Fila rotulo="Enviada" valor={formatearFechaHora(tarea.fecha_envio)} />
             {tarea.fuera_de_plazo && <Etiqueta texto="Fuera de plazo" tono="alerta" />}
-            <BotonEnlace texto="Abrir mi trabajo" url={tarea.archivo_url} />
+            <BotonArchivo archivo={tarea.archivo} />
+            <BotonEnlace texto="Abrir mi enlace" url={tarea.archivo_url} />
             {calificada && (
               <>
                 <Fila rotulo="Calificación" valor={`${tarea.calificacion} / 20`} />
@@ -94,14 +101,17 @@ function ContenidoTareaDetalle({ tarea, navigation }) {
           <Seccion titulo={yaEntrego ? 'Reemplazar entrega' : 'Entregar tarea'} />
           <Tarjeta>
             {(errorLocal || accion.error) && <Aviso tono="error">{errorLocal || accion.error}</Aviso>}
+            {yaEntrego && (
+              <Texto variante="pequeno">Tu nueva entrega reemplaza a la anterior (archivo y enlace).</Texto>
+            )}
+            <SelectorArchivo archivo={archivo} alCambiar={setArchivo} etiqueta="Sube tu trabajo" />
             <Campo
-              etiqueta="Enlace de tu trabajo"
+              etiqueta="O pega un enlace (opcional si subiste un archivo)"
               valor={enlace}
               alCambiar={setEnlace}
               placeholder="https://drive.google.com/..."
               autoCapitalize="none"
               keyboardType="url"
-              ayuda="Sube tu archivo a Drive (o similar) y pega aquí el enlace compartido."
             />
             <Campo etiqueta="Comentario (opcional)" valor={comentario} alCambiar={setComentario} multilinea />
             <Boton

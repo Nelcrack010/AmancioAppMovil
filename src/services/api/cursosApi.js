@@ -1,4 +1,4 @@
-import apiClient, { conIdOperacion } from './apiClient';
+import apiClient, { conIdOperacion, postConArchivo } from './apiClient';
 
 /**
  * Endpoints del aula virtual: cursos, materiales, clases virtuales y tareas.
@@ -28,12 +28,17 @@ export const CursosApi = {
   // --- Tareas ----------------------------------------------------------------------
   tarea: async (idTarea) => (await apiClient.get(`/tareas/item/${idTarea}`)).data,
   tareas: async (idCarga) => (await apiClient.get(`/tareas/${idCarga}`)).data,
-  publicarTarea: async (idCarga, datos) => (await apiClient.post(`/tareas/${idCarga}`, datos)).data,
+  /** POST /tareas/<id_carga> → { titulo, fecha_entrega, bimestre, ... } + archivo del enunciado (opcional) */
+  publicarTarea: async (idCarga, datos, archivo = null) =>
+    (await postConArchivo(`/tareas/${idCarga}`, datos, archivo)).data,
   eliminarTarea: async (idTarea) => (await apiClient.delete(`/tareas/item/${idTarea}`)).data,
 
-  /** POST /tareas/item/<id>/entregar → { archivo_url, comentario } (admite modo sin conexión) */
-  entregarTarea: async (idTarea, datos, idOperacion) =>
-    (await apiClient.post(`/tareas/item/${idTarea}/entregar`, datos, conIdOperacion(idOperacion))).data,
+  /**
+   * POST /tareas/item/<id>/entregar → { archivo_url?, comentario? } + archivo (opcional).
+   * Hace falta el archivo o el enlace. Admite modo sin conexión.
+   */
+  entregarTarea: async (idTarea, datos, idOperacion, archivo = null) =>
+    (await postConArchivo(`/tareas/item/${idTarea}/entregar`, datos, archivo, conIdOperacion(idOperacion))).data,
 
   /** GET /tareas/item/<id>/entregas (docente) → { tarea, resumen, alumnos } */
   entregas: async (idTarea) => (await apiClient.get(`/tareas/item/${idTarea}/entregas`)).data,

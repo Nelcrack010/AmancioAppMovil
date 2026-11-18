@@ -28,7 +28,10 @@ export default function AppNavigator() {
   if (recuperando) return <Cargando mensaje="Recuperando tu sesión..." />;
 
   return (
-    <Stack.Navigator initialRouteName="Menu" screenOptions={OPCIONES_CABECERA}>
+    // Sin initialRouteName: las pantallas cambian según la sesión, y la primera de cada
+    // grupo (Login, PrimerIngreso o Menu) es la inicial. Poner "Menu" aquí rompía la app
+    // cuando no hay sesión, porque en ese momento "Menu" no existe.
+    <Stack.Navigator screenOptions={OPCIONES_CABECERA}>
       {!usuario ? (
         <Stack.Screen name="Login" component={LoginView} options={{ headerShown: false }} />
       ) : usuario.debe_cambiar_password ? (

@@ -10,26 +10,123 @@ aparece al tocar **"Más"**.
 
 ---
 
-## Cómo ejecutar
+## Cómo ejecutar y probar todo en local (guía para el equipo)
 
-1. Instalar dependencias (la primera vez):
-   ```bash
-   npm install
-   ```
-2. Elegir el servidor de la API: copia `.env.example` como `.env.local` y pon la dirección.
-   Para usar el backend de tu PC, escribe la IP de tu PC en la red WiFi (no `127.0.0.1`).
-   Si no creas el archivo, se usa el servidor del equipo.
-3. Iniciar Expo:
-   ```bash
-   npx expo start
-   ```
-   - **Celular:** abre **Expo Go** y escanea el QR.
-   - **Emulador Android:** presiona `a`.
-   - **Navegador** (solo para probar rápido): presiona `w`. El backend debe permitir el origen,
-     por ejemplo `ALLOWED_ORIGINS=http://localhost:8081` en su `.env`.
+Todo funciona con el **backend en tu PC** (no hace falta internet ni el servidor de Oracle):
+mensajería en tiempo real, notificaciones, archivos, asistencia, etc.
 
-Usuarios de prueba: los de los datos de demostración del backend (ver su README).
-La contraseña inicial es el DNI; `ALU-44444444` aún debe cambiarla (primer ingreso).
+### 1. Antes de empezar
+- El **backend** debe estar corriendo en tu PC con `python run.py` (ver el README de
+  `AmancioAppBackend`, sección *Probar la app en local*). Debe responder en
+  `http://localhost:5000`.
+- En el celular instala **Expo Go** (Play Store) e **inicia sesión en Expo Go** con una
+  cuenta de Expo. Si no inicias sesión, el QR puede no abrir el proyecto.
+- Instala las dependencias de la app (la primera vez y cada vez que alguien agregue una):
+  ```bash
+  npm install
+  ```
+
+### 2. Conectar el celular con tu PC (elige UNA forma)
+
+**A. Por cable USB (recomendada: no depende del WiFi ni del router)**
+1. En el celular activa *Opciones de desarrollador → Depuración USB*, conéctalo y acepta
+   **"¿Permitir depuración USB?"**.
+2. Pasa los puertos de la PC al celular por el cable (`adb` está en
+   `%LOCALAPPDATA%\Android\Sdk\platform-tools`, viene con Android Studio):
+   ```bash
+   adb reverse tcp:8081 tcp:8081
+   adb reverse tcp:5000 tcp:5000
+   ```
+   Si desconectas el cable o reinicias el celular, vuelve a ejecutar estos dos comandos.
+3. Crea el archivo `.env.local` (copia de `.env.example`) con:
+   ```
+   EXPO_PUBLIC_API_URL=http://localhost:5000
+   ```
+
+**B. Por WiFi (celular y PC en la misma red)**
+1. Mira la IP de tu PC con `ipconfig` (por ejemplo `192.168.18.64`).
+2. Crea `.env.local` con:
+   ```
+   EXPO_PUBLIC_API_URL=http://192.168.18.64:5000
+   ```
+3. Si Windows pregunta por el firewall al iniciar Python o Node, elige **Permitir**.
+   Algunos routers no dejan que el WiFi hable con una PC conectada por cable: en ese caso
+   usa la forma A.
+
+> `.env.local` no se sube a Git: cada uno pone su propia dirección.
+
+### 3. Iniciar la app
+```bash
+npx expo start -c --go
+```
+- Con cable USB agrega `--localhost`: `npx expo start -c --go --localhost`.
+- `--go` hace que el QR sea para **Expo Go** (el proyecto también tiene `expo-dev-client`;
+  sin `--go` el QR es para una development build y Expo Go muestra *"Can't open this
+  project"*). Si ya está corriendo, presiona `s` para cambiar a Expo Go.
+- `-c` limpia la caché: úsalo siempre que cambies `.env.local`.
+- **Celular:** escanea el QR con Expo Go. La primera carga tarda unos segundos.
+- **Navegador de la PC:** presiona `w` (se abre `http://localhost:8081`). Sirve como
+  "segundo usuario" para las pruebas. El backend debe tener
+  `ALLOWED_ORIGINS=http://localhost:8081` en su `.env`.
+
+### 4. Usuarios de prueba
+La contraseña es el **DNI** (el número del usuario). Ver la lista completa en el README del backend.
+
+| Usuario | Rol | Para probar |
+|---|---|---|
+| `ALU-33333333` Lucía | Alumna (3ro A) | entregas, avisos, chat, mi asistencia |
+| `DOC-22222222` Carlos | Docente (Matemática) | publicar tareas, entregas, chat |
+| `AUX-77777777` Jorge | Auxiliar | registrar asistencia y justificar |
+| `PSI-88888888` Elena | Psicóloga | agenda y citas |
+
+En el celular, cuando la app pida **permiso de notificaciones**, toca **Permitir**.
+
+### 5. Qué probar (celular = Lucía, navegador = Carlos)
+
+**Mensajería en tiempo real (WebSocket)**
+1. Celular: *Mensajes* → conversación con Carlos. Navegador: *Mensajes* → Lucía.
+2. Escribe desde el navegador: aparece **al instante** en el celular (sin recargar).
+3. Responde desde el celular: aparece al instante en el navegador; cuando Carlos tiene el
+   chat abierto, en el celular tu mensaje dice **"· leído"**.
+
+**Notificaciones**
+1. Celular: sal del chat (por ejemplo a *Inicio*) y deja la pantalla **encendida**.
+2. Navegador: Carlos escribe otro mensaje → en el celular suena **"Mensaje de Carlos…"** y
+   sube el globo de *Mensajes*. Al tocar la notificación se abre el chat.
+3. Navegador: Carlos publica una tarea (*Mis cursos → Matemática 3ro A → Tareas*) →
+   en el celular llega **"Nueva tarea de Matemática"**.
+
+**Silenciar o limitar notificaciones**
+1. Celular: *Mi perfil → Notificaciones* (o *Avisos → Configurar*).
+2. Apaga *Tareas nuevas* → **Guardar**. Publica otra tarea: el celular **no suena**, pero el
+   aviso sí aparece en *Avisos*.
+3. Prueba también *Pausar 1 hora* y el horario *no molestar*. Vuelve a dejarlo todo activo.
+
+**Tareas con archivo**
+1. Navegador (Carlos): publica una tarea y adjunta un PDF como enunciado (opcional).
+2. Celular (Lucía): abre la tarea → **Elegir archivo** (PDF, Word, Excel, PowerPoint,
+   imagen o ZIP, máx. 10 MB) y/o pega un enlace → **Entregar**.
+3. Navegador (Carlos): en *Entregas* aparece el archivo; tócalo para abrirlo o descargarlo.
+
+**Asistencia justificada**
+1. Entra como Jorge (`AUX-77777777`) → *Asistencia*. Marca a un alumno con **T** (o **F**).
+2. Toca **J**: quedan marcados **los dos** botones (T + J). Confirma.
+3. Vuelve a abrir el día: siguen marcados T + J. El alumno ve "Tardanza" + "Justificada"
+   en *Mi asistencia*.
+
+### 6. Si algo falla
+| Problema | Solución |
+|---|---|
+| Expo Go: *"Can't open this project"* | Inicia con `--go` (o presiona `s`) y vuelve a escanear. |
+| El QR no abre la app | Inicia sesión en Expo Go; con cable, usa `--localhost` y `adb reverse`. |
+| *"No hay conexión con el servidor"* | Revisa que el backend esté prendido, la dirección de `.env.local` (y reinicia con `-c`), el firewall o el `adb reverse`. |
+| Los mensajes tardan unos segundos | El WebSocket no conectó y la app usa el respaldo (pregunta cada 2,5 s). Revisa que el backend se haya iniciado con `python run.py` y que tenga `Flask-SocketIO` instalado (`pip install -r requirements.txt`). |
+| No suenan las notificaciones | *Ajustes → Aplicaciones → Expo Go → Notificaciones* → activarlas. La app también muestra un botón **"Activar notificaciones"** en *Avisos* si falta el permiso. |
+| No llegan con la pantalla apagada | Normal en Expo Go: Android pausa la app. Con la app cerrada o la pantalla apagada solo llegan push reales, que necesitan una *development build* y `PUSH_ACTIVO=1` en el backend. |
+| El login en el navegador falla | El backend necesita `ALLOWED_ORIGINS=http://localhost:8081` en su `.env` (y reiniciarlo). |
+
+Para emulador Android: presiona `a` en la terminal de Expo (los emuladores no reciben push,
+pero sí el WebSocket y las notificaciones locales).
 
 ---
 
@@ -67,6 +164,34 @@ Pantalla (views) → ViewModel (viewmodels) → Repositorio (repositories) → S
 - **Agregar un endpoint:** función en `src/services/api/<modulo>Api.js` y luego en su repositorio.
 - **Hacer que otra operación funcione sin conexión:** agrégala en `ENVIOS` de
   `src/repositories/colaRepository.js` (la API debe aceptar la cabecera `X-Id-Operacion`).
+- **Tiempo real:** la conexión WebSocket está en `src/services/tiempoRealService.js`
+  (`escucharTiempoReal('mensaje', fn)`); los intervalos de respaldo, en `src/config/tiempoReal.js`.
+  Para que otra pantalla se actualice sola: `useConsulta(fuente, deps, { actualizarCada, tiposPush })`.
+- **Tipos de archivo que se pueden subir y tamaño máximo:** `src/config/archivos.js`
+  (deben coincidir con `archivo_service.py` del backend).
+- **Ícono y pantalla de cada notificación:** `src/config/notificaciones.js`. El nombre,
+  la descripción y quién recibe cada tipo están en `TIPOS` del backend.
+- **Cómo se marcan los botones de asistencia (justificar):** `tocarAsistencia` y
+  `botonAsistenciaActivo` en `src/config/estados.js`.
+
+## Tiempo real, archivos y notificaciones
+
+- **Mensajería y avisos en tiempo real (WebSocket):** al iniciar sesión la app abre una
+  conexión WebSocket con el backend (`src/services/tiempoRealService.js`). Los mensajes,
+  el "leído", los avisos y los globos llegan **al instante**, sin preguntar al servidor.
+  Funciona con el backend local (`python run.py`), sin internet y en **Expo Go**.
+  Si el WebSocket no conecta, las pantallas preguntan cada pocos segundos (respaldo).
+- **Notificaciones en el celular sin development build:** cada aviso que llega por el
+  WebSocket se muestra como notificación del celular (si el usuario no lo silenció) y al
+  tocarla se abre su pantalla. Con la app cerrada solo llegan los push (development build
+  + `PUSH_ACTIVO=1`).
+- **Entregar tareas con archivo:** PDF, Word, Excel, PowerPoint, imágenes o ZIP (máx. 10 MB),
+  y/o un enlace. El docente puede adjuntar el enunciado como archivo.
+- **Silenciar o limitar notificaciones:** *Mi perfil → Notificaciones* (o *Avisos →
+  Configurar*): silenciar todas, pausar 1/8/24 h, horario "no molestar" y elegir qué tipos
+  recibir. Solo afecta al celular: los avisos siguen en la lista.
+- **Asistencia justificada:** al justificar una T o F, quedan marcados los dos botones
+  (por ejemplo T + J) y el alumno ve "Tardanza" + "Justificada".
 
 ---
 
@@ -110,9 +235,8 @@ Pantalla (views) → ViewModel (viewmodels) → Repositorio (repositories) → S
 
 ## Pendiente
 
-- **Notificaciones push** en el celular (registrar el token de Expo con `expo-notifications`
-  en `POST /dispositivos/token`). La pantalla de avisos ya funciona con la API.
-- **Cámara y galería:** la API recibe enlaces, no archivos. Las entregas y evidencias se
-  envían como enlace (Drive u otro) hasta que la API acepte `multipart/form-data`.
+- **Push en el celular:** requiere una *development build* (Expo Go en Android no recibe
+  push) y `PUSH_ACTIVO=1` en el servidor.
+- **Evidencias de conducta con archivo:** siguen siendo un enlace (solo las tareas aceptan archivos).
 - **Ajuste de la nota de conducta por el tutor** y **lista de seguimiento** del psicólogo:
   faltan los endpoints en la API.

@@ -9,6 +9,7 @@
 export const API_CONFIG = {
   BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'https://146.181.54.237',
   TIMEOUT_MS: 15000,
+  TIMEOUT_ARCHIVOS_MS: 90000,   // subir un archivo puede tardar más (datos móviles)
   HEADERS: {
     'Content-Type': 'application/json',
     Accept: 'application/json',

@@ -1,10 +1,18 @@
-﻿import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import * as Notifications from 'expo-notifications';
-import { registrarAlExpirarSesion } from '../services/api/apiClient';
-import PerfilApi from '../services/api/perfilApi';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { obtenerToken, registrarAlExpirarSesion } from '../services/api/apiClient';
+import MensajesApi from '../services/api/mensajesApi';
+import Almacenamiento from '../services/almacenamiento';
 import SesionRepository from '../repositories/sesionRepository';
 import MensajesRepository from '../repositories/mensajesRepository';
-import { obtenerTokenPushAsync } from '../services/notificacionesPushService';
+import {
+  marcarTokenPushRegistrado, mostrarNotificacionLocal, obtenerTokenPushAsync,
+} from '../services/notificacionesPushService';
+import {
+  conectarTiempoReal, desconectarTiempoReal, escucharTiempoReal,
+} from '../services/tiempoRealService';
+import { STORAGE_KEYS } from '../config/constants';
+import useTiempoReal from '../viewmodels/useTiempoReal';
+import { CUALQUIER_PUSH, TIEMPO_REAL } from '../config/tiempoReal';
 
 /**
  * SesionContext: estado global de la sesión, disponible en toda la app con useSesion().
@@ -20,7 +28,6 @@ import { obtenerTokenPushAsync } from '../services/notificacionesPushService';
 const SesionContext = createContext(null);
 
 const CONTADORES_VACIOS = { mensajes: 0, notificaciones: 0 };
-const CADA_DOS_MINUTOS = 120000;
 
 export function SesionProvider({ children }) {
   const [usuario, setUsuario] = useState(null);
@@ -73,68 +80,55 @@ export function SesionProvider({ children }) {
     });
   }, []);
 
-  /** Pide al servidor los contadores (se llama tras leer mensajes o avisos). */
+  /** Pide al servidor los contadores (tras leer mensajes o avisos, y en tiempo real). */
   const refrescarContadores = useCallback(async () => {
     try {
-      fijarContadores(await PerfilApi.inicio());
+      fijarContadores(await MensajesApi.contadores());
     } catch {
       // Sin conexión: se quedan los contadores anteriores.
     }
   }, [fijarContadores]);
 
-  // Mientras haya sesión (y la contraseña ya no sea la inicial), refrescar cada 2 minutos.
+  // Mientras haya sesión (y la contraseña ya no sea la inicial): pedir los contadores al
+  // entrar y luego en tiempo real (cada TIEMPO_REAL.CONTADORES_MS y al llegar cualquier push).
   const sesionLista = Boolean(usuario) && !usuario.debe_cambiar_password;
   useEffect(() => {
-    if (!sesionLista) return undefined;
-    refrescarContadores();
-    const intervalo = setInterval(refrescarContadores, CADA_DOS_MINUTOS);
-    return () => clearInterval(intervalo);
+    if (sesionLista) refrescarContadores();
   }, [sesionLista, refrescarContadores]);
+  useTiempoReal(refrescarContadores, TIEMPO_REAL.CONTADORES_MS, {
+    activo: sesionLista,
+    tiposPush: CUALQUIER_PUSH,
+  });
 
-  // --- Registro de token push y listener de notificaciones en tiempo real ------------
+  // --- Tiempo real por WebSocket (src/services/tiempoRealService.js) ------------------
+  // Con sesión: se abre la conexión con el token. Al cerrar sesión (o vencer), se cierra.
+  // Cada notificación que llega se muestra en el celular al instante (si no la silenció).
   useEffect(() => {
     if (!sesionLista) return undefined;
-
-    let suscripcionRecibida = null;
-
-    try {
-      // 1. Obtener y registrar el token push en el backend
-      obtenerTokenPushAsync()
-        .then((token) => {
-          if (token) {
-            return MensajesRepository.registrarTokenPush(token);
-          }
-        })
-        .catch(() => {
-          // Fallos de registro no deben interrumpir el uso de la app
-        });
-
-      // 2. Listener cuando llega una notificación con la app en primer plano:
-      // actualiza los contadores de avisos y mensajes en tiempo real.
-      // (La navegación al tocar una notificación se gestiona exclusivamente en linking de App.jsx)
-      try {
-        suscripcionRecibida = Notifications.addNotificationReceivedListener(() => {
-          try {
-            refrescarContadores();
-          } catch {
-            // No romper si falla refrescar contadores
-          }
-        });
-      } catch {
-        // Ignorar si el listener no puede agregarse
-      }
-    } catch {
-      // Cualquier fallo en el setup de notificaciones es completamente silencioso
-    }
-
+    let cancelado = false;
+    (obtenerToken() ? Promise.resolve(obtenerToken()) : Almacenamiento.leer(STORAGE_KEYS.AUTH_TOKEN))
+      .then((token) => { if (!cancelado) conectarTiempoReal(token); })
+      .catch(() => {});
+    const dejarDeEscuchar = escucharTiempoReal('notificacion', mostrarNotificacionLocal);
     return () => {
-      try {
-        if (suscripcionRecibida) suscripcionRecibida.remove();
-      } catch {
-        // Ignorar en cleanup
-      }
+      cancelado = true;
+      dejarDeEscuchar();
+      desconectarTiempoReal();
     };
-  }, [sesionLista, refrescarContadores]);
+  }, [sesionLista, usuario?.id_usuario]);
+
+  // --- Registro del celular para recibir notificaciones push -------------------------
+  // (Tocar una notificación lo maneja src/navigation/abrirNotificacion.js.)
+  useEffect(() => {
+    if (!sesionLista) return;
+    marcarTokenPushRegistrado(false);
+    obtenerTokenPushAsync()
+      .then((token) => (token ? MensajesRepository.registrarTokenPush(token) : false))
+      .then(marcarTokenPushRegistrado)
+      .catch(() => {
+        // Si falla el registro, la app funciona igual: los avisos llegan por el WebSocket.
+      });
+  }, [sesionLista]);
 
   const valor = useMemo(() => ({
     usuario, recuperando, sesionVencida, contadores,

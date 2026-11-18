@@ -7,6 +7,7 @@ import { MENU_POR_ROL } from '../config/menus';
 import { COLORES } from '../config/tema';
 import { OPCIONES_CABECERA } from './estilosNavegacion';
 import { PANTALLAS_MENU } from './pantallas';
+import { useAbrirNotificacionesPush } from './abrirNotificacion';
 
 const Tabs = createBottomTabNavigator();
 
@@ -19,6 +20,9 @@ const Tabs = createBottomTabNavigator();
 export default function MenuNavigator() {
   const { usuario } = useSesion();
   const opciones = MENU_POR_ROL[usuario.rol] || [];
+
+  // Al tocar una notificación push, abrir la pantalla relacionada (ver abrirNotificacion.js).
+  useAbrirNotificacionesPush();
 
   return (
     <Tabs.Navigator

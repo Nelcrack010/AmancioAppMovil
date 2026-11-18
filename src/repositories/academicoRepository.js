@@ -47,9 +47,18 @@ export const AcademicoRepository = {
     ColaRepository.enviar('NOTAS', { id_carga: idCarga, datos }, descripcion),
 
   // --- Acciones del alumno --------------------------------------------------------------
-  /** Entrega una tarea con el enlace del trabajo (admite modo sin conexión). */
-  entregarTarea: (idTarea, datos, descripcion) =>
-    ColaRepository.enviar('ENTREGA_TAREA', { id_tarea: idTarea, datos }, descripcion),
+  /**
+   * Entrega una tarea con un archivo y/o un enlace (admite modo sin conexión).
+   * En el celular el archivo queda copiado en la app, así que se puede enviar después.
+   * En el navegador no se puede guardar el archivo para después: se envía directamente.
+   */
+  entregarTarea: async (idTarea, datos, descripcion, archivo = null) => {
+    if (archivo?.file) {
+      return { enviado: true, respuesta: await CursosApi.entregarTarea(idTarea, datos, null, archivo) };
+    }
+    const paraLaCola = archivo && { uri: archivo.uri, nombre: archivo.nombre, tipo: archivo.tipo, tamano: archivo.tamano };
+    return ColaRepository.enviar('ENTREGA_TAREA', { id_tarea: idTarea, datos, archivo: paraLaCola }, descripcion);
+  },
 };
 
 export default AcademicoRepository;

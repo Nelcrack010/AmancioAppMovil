@@ -16,6 +16,41 @@ export const ESTADOS_ASISTENCIA = {
   J: { texto: 'Justificada', corto: 'J', tono: 'info' },
 };
 
+/**
+ * JUSTIFICAR una tardanza o falta sin perder lo que pasó.
+ * La API guarda J (justificada) y en `estado_original` lo que tenía antes (T o F).
+ * En pantalla se ven los DOS marcados: por ejemplo "T" + "J" = tardanza justificada.
+ */
+export const JUSTIFICADA = 'J';
+export const SE_PUEDEN_JUSTIFICAR = ['T', 'F'];
+export const ORIGINAL_POR_DEFECTO = 'F';   // J sin nada antes = falta justificada
+
+/**
+ * Qué pasa al tocar un botón de asistencia. `marca` = { estado, original }.
+ *   - P, T o F: queda ese estado (sin justificar).
+ *   - J sobre una T o F: se justifica y la T/F queda marcada también.
+ *   - J otra vez sobre una justificada: se quita la justificación (vuelve a T o F).
+ *   - J sobre un presente: falta justificada.
+ */
+export function tocarAsistencia(marca, boton) {
+  if (boton !== JUSTIFICADA) return { estado: boton, original: null };
+  if (marca?.estado === JUSTIFICADA) return { estado: marca.original || ORIGINAL_POR_DEFECTO, original: null };
+  const original = SE_PUEDEN_JUSTIFICAR.includes(marca?.estado) ? marca.estado : ORIGINAL_POR_DEFECTO;
+  return { estado: JUSTIFICADA, original };
+}
+
+/** ¿El botón `boton` se ve marcado? (en una justificada se marcan J y su T/F) */
+export function botonAsistenciaActivo(marca, boton) {
+  return marca?.estado === boton || (marca?.estado === JUSTIFICADA && marca.original === boton);
+}
+
+/** Etiquetas para mostrar un registro: [Tardanza, Justificada] o solo [Presente]. */
+export function etiquetasAsistencia({ estado, estado_original: original }) {
+  const principal = infoEstado(ESTADOS_ASISTENCIA, estado);
+  if (estado !== JUSTIFICADA) return [principal];
+  return [infoEstado(ESTADOS_ASISTENCIA, original || ORIGINAL_POR_DEFECTO), principal];
+}
+
 /** Estado de una tarea para el alumno (y de cada entrega para el docente). */
 export const ESTADOS_TAREA = {
   PENDIENTE: { texto: 'Pendiente', tono: 'alerta' },

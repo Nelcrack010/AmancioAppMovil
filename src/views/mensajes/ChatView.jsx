@@ -16,6 +16,7 @@ const MAXIMO_CARACTERES = 2000;   // el mismo límite que valida la API
 /**
  * ChatView: mensajes de una conversación (burbujas propias a la derecha, en azul,
  * como en el campus web) y caja para escribir.
+ * Se actualiza en tiempo real mientras está abierta (ver useChatViewModel).
  */
 export default function ChatView({ navigation, route }) {
   const insets = useSafeAreaInsets();
@@ -31,8 +32,11 @@ export default function ChatView({ navigation, route }) {
     if (chat.contacto?.nombre) navigation.setOptions({ title: chat.contacto.nombre });
   }, [navigation, chat.contacto?.nombre]);
 
+  // La caja se limpia enseguida; si el envío falla, el texto vuelve a la caja.
   const enviar = async () => {
-    if (await chat.enviar(texto)) setTexto('');
+    const escrito = texto;
+    setTexto('');
+    if (!await chat.enviar(escrito)) setTexto(escrito);
   };
 
   if (chat.cargando) return <Cargando mensaje="Cargando conversación..." />;
@@ -51,13 +55,16 @@ export default function ChatView({ navigation, route }) {
         {chat.contacto?.rol && (
           <Texto variante="diminuto" centrado style={estilos.rol}>{NOMBRES_ROL[chat.contacto.rol]}</Texto>
         )}
-        {chat.mensajes.length === 0 && chat.enCola.length === 0 && (
+        {chat.mensajes.length === 0 && chat.enCola.length === 0 && chat.enviandose.length === 0 && (
           <Texto variante="pequeno" centrado>Escribe el primer mensaje.</Texto>
         )}
 
         {chat.mensajes.map((m) => (
           <Burbuja key={m.id_mensaje} mio={m.mio} texto={m.contenido}
             pie={`${formatearFechaHora(m.fecha_envio)}${m.mio && m.leido ? ' · leído' : ''}`} />
+        ))}
+        {chat.enviandose.map((m) => (
+          <Burbuja key={m.clave} mio pendiente texto={m.contenido} pie="Enviando..." />
         ))}
         {chat.enCola.map((m, i) => (
           <Burbuja key={`cola-${i}`} mio pendiente texto={m.contenido} pie="Pendiente · se enviará al volver la red" />
@@ -78,8 +85,8 @@ export default function ChatView({ navigation, route }) {
         />
         <Pressable
           onPress={enviar}
-          disabled={chat.enviando || !texto.trim()}
-          style={[estilos.enviar, (chat.enviando || !texto.trim()) && estilos.inactivo]}
+          disabled={!texto.trim()}
+          style={[estilos.enviar, !texto.trim() && estilos.inactivo]}
           accessibilityLabel="Enviar mensaje"
         >
           <Ionicons name="send" size={20} color={COLORES.blanco} />

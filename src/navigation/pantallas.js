@@ -16,6 +16,7 @@ import NotificacionesView from '../views/comun/NotificacionesView';
 import PerfilView from '../views/comun/PerfilView';
 import EditarPerfilView from '../views/comun/EditarPerfilView';
 import PendientesView from '../views/comun/PendientesView';
+import AjustesNotificacionesView from '../views/comun/AjustesNotificacionesView';
 import CatalogoFaltasView from '../views/comun/CatalogoFaltasView';
 import CambiarPasswordView from '../views/auth/CambiarPasswordView';
 // --- Mensajería ------------------------------------------------------------------------------
@@ -82,6 +83,7 @@ export const PANTALLAS_DETALLE = {
   EditarPerfil: { componente: EditarPerfilView, titulo: 'Editar mis datos' },
   CambiarPassword: { componente: CambiarPasswordView, titulo: 'Cambiar contraseña' },
   Pendientes: { componente: PendientesView, titulo: 'Operaciones pendientes' },
+  AjustesNotificaciones: { componente: AjustesNotificacionesView, titulo: 'Notificaciones' },
   SolicitarCita: { componente: SolicitarCitaView, titulo: 'Solicitar cita' },
   RegistrarReporte: { componente: RegistrarReporteView, titulo: 'Registrar reporte' },
   ConductaAlumno: { componente: ConductaAlumnoView, titulo: 'Conducta del estudiante' },

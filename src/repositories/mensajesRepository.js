@@ -11,6 +11,8 @@ export const MensajesRepository = {
   contactos: () => fuente('contactos', MensajesApi.contactos),
   conversaciones: () => fuente('conversaciones', MensajesApi.conversaciones),
   conversacion: (id) => fuente(`conversacion:${id}`, () => MensajesApi.conversacion(id)),
+  /** Solo los mensajes posteriores a `desde` (id del último que ya se tiene). */
+  mensajesNuevos: (id, desde) => MensajesApi.conversacion(id, desde),
   marcarLeida: MensajesApi.marcarLeida,
 
   /**
@@ -28,14 +30,18 @@ export const MensajesRepository = {
   notificaciones: () => fuente('notificaciones', MensajesApi.notificaciones),
   marcarNotificacionLeida: MensajesApi.marcarNotificacionLeida,
   marcarTodasLeidas: MensajesApi.marcarTodasLeidas,
+  /** Qué notificaciones push recibe el usuario (silenciar, pausar, tipos, no molestar). */
+  preferencias: () => fuente('preferencias-notificaciones', MensajesApi.preferencias),
+  guardarPreferencias: MensajesApi.guardarPreferencias,
 
   // --- Dispositivos Push --------------------------------------------------------------------
   /** Registra el token push en el backend y lo persiste en almacenamiento seguro. */
   async registrarTokenPush(token) {
-    if (!token) return;
+    if (!token) return false;
     const plataforma = Platform.OS === 'ios' ? 'ios' : 'android';
     await MensajesApi.registrarDispositivo(token, plataforma);
     await Almacenamiento.guardar(STORAGE_KEYS.PUSH_TOKEN, token);
+    return true;
   },
 
   /** Obtiene el token push guardado en el almacenamiento seguro. */

@@ -4,6 +4,7 @@ import useAccion from './useAccion';
 import AsistenciaRepository from '../repositories/asistenciaRepository';
 import AcademicoRepository from '../repositories/academicoRepository';
 import { esFechaValida, hoyISO } from '../utils/fechas';
+import { JUSTIFICADA, tocarAsistencia } from '../config/estados';
 
 /**
  * useRegistroAsistenciaViewModel: registro de la asistencia diaria de una sección.
@@ -13,13 +14,17 @@ import { esFechaValida, hoyISO } from '../utils/fechas';
  *   2. Se cargan los estudiantes; por omisión todos aparecen como PRESENTES (o con lo que
  *      ya estaba registrado ese día, para corregirlo).
  *   3. Marcar el estado de cada uno (P, T, F, J).
+ *      J justifica la tardanza o falta marcada: quedan los DOS marcados (por ejemplo,
+ *      T + J) para saber qué pasó. La regla está en tocarAsistencia (src/config/estados.js).
  *   4. Confirmar: se envía TODO en una sola operación. Sin red, queda pendiente.
+ *
+ * Cada marca es { estado, original }: original es la T o F que se justificó (solo con J).
  */
 export function useRegistroAsistenciaViewModel(idSeccionInicial) {
   const secciones = useConsulta(() => AcademicoRepository.secciones(), []);
   const [idSeccion, setIdSeccion] = useState(idSeccionInicial || null);
   const [fecha, setFecha] = useState(hoyISO());
-  const [marcas, setMarcas] = useState({});          // { id_alumno: 'P' | 'T' | 'F' | 'J' }
+  const [marcas, setMarcas] = useState({});          // { id_alumno: { estado, original } }
   const [hayCambios, setHayCambios] = useState(false);
   const accion = useAccion();
 
@@ -50,9 +55,11 @@ export function useRegistroAsistenciaViewModel(idSeccionInicial) {
   useEffect(() => {
     if (!alumnos.datos || hayCambios) return;
     const previas = {};
-    (registrado.datos?.registros || []).forEach((r) => { previas[r.id_alumno] = r.estado; });
+    (registrado.datos?.registros || []).forEach((r) => {
+      previas[r.id_alumno] = { estado: r.estado, original: r.estado_original || null };
+    });
     const iniciales = {};
-    alumnos.datos.forEach((a) => { iniciales[a.id_alumno] = previas[a.id_alumno] || 'P'; });
+    alumnos.datos.forEach((a) => { iniciales[a.id_alumno] = previas[a.id_alumno] || { estado: 'P', original: null }; });
     setMarcas(iniciales);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alumnos.datos, registrado.datos]);
@@ -61,21 +68,22 @@ export function useRegistroAsistenciaViewModel(idSeccionInicial) {
   const elegirSeccion = (id) => { setHayCambios(false); setIdSeccion(id); };
   const elegirFecha = (f) => { setHayCambios(false); setFecha(f); };
 
-  const marcar = (idAlumno, estado) => {
-    setMarcas((m) => ({ ...m, [idAlumno]: estado }));
+  /** Toca un botón (P, T, F o J) de un estudiante. */
+  const marcar = (idAlumno, boton) => {
+    setMarcas((m) => ({ ...m, [idAlumno]: tocarAsistencia(m[idAlumno], boton) }));
     setHayCambios(true);
   };
 
   /** Marca a todos con el mismo estado (por ejemplo, "todos presentes"). */
   const marcarTodos = (estado) => {
-    setMarcas((m) => Object.fromEntries(Object.keys(m).map((id) => [id, estado])));
+    setMarcas((m) => Object.fromEntries(Object.keys(m).map((id) => [id, { estado, original: null }])));
     setHayCambios(true);
   };
 
   /** Totales para el resumen antes de confirmar. */
   const resumen = useMemo(() => {
     const r = { P: 0, T: 0, F: 0, J: 0 };
-    Object.values(marcas).forEach((e) => { r[e] += 1; });
+    Object.values(marcas).forEach((m) => { r[m.estado] += 1; });
     return r;
   }, [marcas]);
 
@@ -89,7 +97,12 @@ export function useRegistroAsistenciaViewModel(idSeccionInicial) {
     const datos = {
       id_seccion: idSeccion,
       fecha,
-      registros: Object.entries(marcas).map(([id, estado]) => ({ id_alumno: Number(id), estado })),
+      registros: Object.entries(marcas).map(([id, m]) => ({
+        id_alumno: Number(id),
+        estado: m.estado,
+        // Solo las justificadas llevan qué se justificó (T o F).
+        ...(m.estado === JUSTIFICADA ? { estado_original: m.original } : {}),
+      })),
     };
     const r = await accion.ejecutar(() => AsistenciaRepository.registrarLote(
       datos, `Asistencia de ${nombreSeccion()} del ${fecha}`,

@@ -7,6 +7,7 @@ import Boton from '../../components/Boton';
 import { Fila } from '../../components/Basicos';
 import { Aviso } from '../../components/Estados';
 import { BotonEnlace } from '../../components/Items';
+import { BotonArchivo } from '../../components/Archivos';
 import useAccion from '../../viewmodels/useAccion';
 import AcademicoRepository from '../../repositories/academicoRepository';
 import { avisar } from '../../utils/dialogos';
@@ -55,7 +56,8 @@ export default function CalificarEntregaView({ navigation, route }) {
         <Fila rotulo="Enviada" valor={formatearFechaHora(alumno.fecha_envio)} />
         {alumno.fuera_de_plazo && <Aviso tono="alerta">Entregada fuera de plazo.</Aviso>}
         {alumno.comentario_alumno && <Aviso tono="info" icono="chatbox-ellipses">{alumno.comentario_alumno}</Aviso>}
-        <BotonEnlace texto="Abrir el trabajo" url={alumno.archivo_url} />
+        <BotonArchivo archivo={alumno.archivo} />
+        <BotonEnlace texto="Abrir el enlace del trabajo" url={alumno.archivo_url} />
       </Tarjeta>
 
       <Tarjeta>

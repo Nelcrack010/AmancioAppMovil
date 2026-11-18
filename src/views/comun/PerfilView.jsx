@@ -86,6 +86,9 @@ export default function PerfilView({ navigation }) {
                 onPress={() => navigation.navigate('EditarPerfil', { perfil: datos })} />
               <ItemLista icono="key-outline" titulo="Cambiar contraseña"
                 onPress={() => navigation.navigate('CambiarPassword')} />
+              <ItemLista icono="notifications-outline" titulo="Notificaciones"
+                subtitulo="Silenciar o elegir qué avisos recibir"
+                onPress={() => navigation.navigate('AjustesNotificaciones')} />
               <ItemLista
                 icono="cloud-upload-outline"
                 titulo="Operaciones pendientes"

@@ -8,6 +8,8 @@ import Lista, { ItemLista } from '../../components/Lista';
 import { Avatar, Dato, FilaDatos } from '../../components/Basicos';
 import { Vacio } from '../../components/Estados';
 import { abrirEnlace } from '../../components/Items';
+import { urlDeArchivo } from '../../services/archivos';
+import { BotonArchivo } from '../../components/Archivos';
 import useConsulta from '../../viewmodels/useConsulta';
 import AcademicoRepository from '../../repositories/academicoRepository';
 import { formatearFechaHora } from '../../utils/fechas';
@@ -34,6 +36,9 @@ export default function EntregasView({ navigation, route }) {
             <Texto variante="pequeno" style={estilos.plazo}>
               Entrega hasta el {formatearFechaHora(datos.tarea.fecha_entrega)}
             </Texto>
+            {datos.tarea.adjunto && (
+              <View style={estilos.plazo}><BotonArchivo archivo={datos.tarea.adjunto} texto="Enunciado" /></View>
+            )}
 
             <FilaDatos>
               <Dato valor={datos.resumen.ENTREGADA} rotulo="Por calificar" color={COLORES.azul} />
@@ -58,9 +63,11 @@ export default function EntregasView({ navigation, route }) {
                 {lista.map((a) => {
                   const estado = infoEstado(ESTADOS_TAREA, a.estado);
                   const porCalificar = a.estado === 'ENTREGADA';
+                  // Calificada: se abre lo que entregó (primero el archivo; si no, el enlace).
+                  const trabajo = urlDeArchivo(a.archivo) || a.archivo_url;
                   let alTocar;
                   if (porCalificar) alTocar = () => navigation.navigate('CalificarEntrega', { alumno: a, tarea: datos.tarea });
-                  else if (a.archivo_url) alTocar = () => abrirEnlace(a.archivo_url);
+                  else if (trabajo) alTocar = () => abrirEnlace(trabajo);
 
                   return (
                     <ItemLista
@@ -70,7 +77,7 @@ export default function EntregasView({ navigation, route }) {
                       subtitulo={a.fecha_envio
                         ? `Enviada: ${formatearFechaHora(a.fecha_envio)}${a.fuera_de_plazo ? ' · fuera de plazo' : ''}`
                         : 'Sin entregar'}
-                      detalle={porCalificar ? 'Toca para calificar' : undefined}
+                      detalle={[a.archivo?.nombre, porCalificar ? 'Toca para calificar' : null].filter(Boolean).join(' · ') || undefined}
                       acento={porCalificar ? COLORES.azul : undefined}
                       derecha={(
                         <View style={estilos.derecha}>

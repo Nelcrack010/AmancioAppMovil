@@ -22,7 +22,7 @@ import { idUsuarioActual } from './sesionRepository';
 const ENVIOS = {
   ASISTENCIA: (p, id) => AsistenciaApi.registrarLote(p, id),
   REPORTE_CONDUCTA: (p, id) => ConductaApi.registrarReporte(p, id),
-  ENTREGA_TAREA: (p, id) => CursosApi.entregarTarea(p.id_tarea, p.datos, id),
+  ENTREGA_TAREA: (p, id) => CursosApi.entregarTarea(p.id_tarea, p.datos, id, p.archivo),
   SOLICITUD_CITA: (p, id) => ConductaApi.solicitarCita(p, id),
   NOTAS: (p, id) => NotasApi.registrar(p.id_carga, p.datos, id),
   MENSAJE: (p, id) => (p.id_conversacion

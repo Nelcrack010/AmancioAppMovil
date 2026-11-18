@@ -11,7 +11,7 @@ import useRegistroAsistenciaViewModel from '../../viewmodels/useRegistroAsistenc
 import { useGuardiaSalida } from '../../navigation/guardiaSalida';
 import { avisarResultado, confirmar } from '../../utils/dialogos';
 import { formatearFecha, hoyISO, nombreDia, sumarDias } from '../../utils/fechas';
-import { ESTADOS_ASISTENCIA } from '../../config/estados';
+import { ESTADOS_ASISTENCIA, botonAsistenciaActivo } from '../../config/estados';
 import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
 
 const ESTADOS = ['P', 'T', 'F', 'J'];
@@ -111,7 +111,8 @@ export default function RegistrarAsistenciaView({ route }) {
               <Texto style={estilos.nombre} numberOfLines={2}>{i + 1}. {a.apellidos}, {a.nombres}</Texto>
               <View style={estilos.estados}>
                 {ESTADOS.map((e) => {
-                  const activo = vm.marcas[a.id_alumno] === e;
+                  // En una justificada se ven marcados J y la T o F que se justificó.
+                  const activo = botonAsistenciaActivo(vm.marcas[a.id_alumno], e);
                   return (
                     <Pressable
                       key={e}
@@ -130,6 +131,9 @@ export default function RegistrarAsistenciaView({ route }) {
           ))}
           </View>
           <Texto variante="diminuto" centrado>P: presente · T: tardanza · F: falta · J: justificada</Texto>
+          <Texto variante="diminuto" centrado style={estilos.ayuda}>
+            Para justificar, toca J sobre una T o F: quedan marcadas las dos. Toca J otra vez para quitarla.
+          </Texto>
         </>
       )}
     </Pantalla>
@@ -159,6 +163,7 @@ const estilos = StyleSheet.create({
   },
   conLinea: { borderTopWidth: 1, borderTopColor: COLORES.linea },
   nombre: { flex: 1 },
+  ayuda: { marginTop: 2, marginBottom: ESPACIO.sm },
   estados: { flexDirection: 'row', gap: 6 },
   estado: {
     width: 38,

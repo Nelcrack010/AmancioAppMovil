@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import CacheRepository from '../repositories/cacheRepository';
+import useTiempoReal from './useTiempoReal';
 
 /**
  * useConsulta: ViewModel genérico para las pantallas que MUESTRAN datos.
@@ -22,8 +23,16 @@ import CacheRepository from '../repositories/cacheRepository';
  *
  * Los datos se vuelven a pedir cada vez que la pantalla se enfoca (por ejemplo, al
  * regresar de entregar una tarea) y cuando cambian las dependencias (deps).
+ *
+ * TIEMPO REAL (opcional, tercer parámetro): la pantalla se actualiza sola, sin parpadear,
+ * mientras está a la vista:
+ *
+ *     useConsulta(() => MensajesRepository.conversaciones(), [], {
+ *       actualizarCada: TIEMPO_REAL.CONVERSACIONES_MS,   // cada 5 s (src/config/tiempoReal.js)
+ *       tiposPush: ['MENSAJE'],                          // y al llegar un push de mensaje
+ *     });
  */
-export function useConsulta(crearFuente, deps = []) {
+export function useConsulta(crearFuente, deps = [], { actualizarCada = null, tiposPush = null } = {}) {
   const [estado, setEstado] = useState({
     cargando: true, refrescando: false, datos: null, error: null, aviso: null, actualizadoEn: null,
   });
@@ -77,6 +86,27 @@ export function useConsulta(crearFuente, deps = []) {
   useFocusEffect(useCallback(() => {
     cargar();
   }, [cargar]));
+
+  // Actualización en segundo plano (tiempo real): pide los datos de nuevo y solo cambia
+  // la pantalla si llegó algo distinto. No muestra "cargando" ni errores: si falla,
+  // se intenta en la próxima vuelta.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const actualizarEnSilencio = useCallback(async () => {
+    const numero = ultimaCarga.current;
+    const fuente = crearFuente();
+    if (!fuente) return;
+    const datos = await CacheRepository.actualizar(fuente);
+    if (numero !== ultimaCarga.current) return;      // empezó otra carga mientras tanto
+    setEstado((e) => {
+      if (e.clave !== fuente.clave) return e;
+      const igual = JSON.stringify(e.datos) === JSON.stringify(datos);
+      if (igual && !e.aviso && !e.error) return e;     // nada cambió: no se redibuja
+      return { ...e, cargando: false, datos, error: null, aviso: null, actualizadoEn: null };
+    });
+  }, deps);
+
+  const enFoco = useIsFocused();
+  useTiempoReal(actualizarEnSilencio, actualizarCada, { activo: enFoco, tiposPush });
 
   return { ...estado, recargar: cargar };
 }

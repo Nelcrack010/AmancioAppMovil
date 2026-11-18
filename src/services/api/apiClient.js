@@ -114,4 +114,24 @@ export function conIdOperacion(idOperacion) {
   return idOperacion ? { headers: { 'X-Id-Operacion': idOperacion } } : {};
 }
 
+/**
+ * POST que puede llevar un ARCHIVO (PDF, Word, imagen...).
+ *   - Sin archivo: es un POST normal con JSON.
+ *   - Con archivo: se envía como multipart/form-data con dos campos:
+ *       datos   → el mismo JSON de siempre, como texto
+ *       archivo → el archivo elegido (ver src/services/archivos.js)
+ */
+export function postConArchivo(url, datos, archivo, config = {}) {
+  if (!archivo) return apiClient.post(url, datos, config);
+  const formulario = new FormData();
+  formulario.append('datos', JSON.stringify(datos));
+  // En el navegador se envía el File; en el celular, { uri, name, type }.
+  formulario.append('archivo', archivo.file || { uri: archivo.uri, name: archivo.nombre, type: archivo.tipo });
+  return apiClient.post(url, formulario, {
+    ...config,
+    timeout: API_CONFIG.TIMEOUT_ARCHIVOS_MS,
+    headers: { ...(config.headers || {}), 'Content-Type': 'multipart/form-data' },
+  });
+}
+
 export default apiClient;

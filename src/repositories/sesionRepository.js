@@ -22,11 +22,6 @@ export function idUsuarioActual() {
   return usuarioActual?.id_usuario ?? null;
 }
 
-/** Devuelve los datos básicos del usuario en memoria (incluye rol). */
-export function usuarioEnMemoria() {
-  return usuarioActual;
-}
-
 async function guardarSesion(token, usuario) {
   promesaRecuperacion = null;
   await Almacenamiento.guardar(STORAGE_KEYS.AUTH_TOKEN, token);
@@ -124,11 +119,5 @@ export const SesionRepository = {
     usuarioActual = null;
   },
 };
-
-/** Espera a que la sesión esté recuperada y el token JWT listo en apiClient. */
-export async function esperarTokenSesion() {
-  const usuario = await SesionRepository.recuperarSesion();
-  return usuario ? obtenerToken() : null;
-}
 
 export default SesionRepository;

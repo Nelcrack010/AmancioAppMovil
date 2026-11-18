@@ -10,6 +10,7 @@ import useConsulta from '../../viewmodels/useConsulta';
 import MensajesRepository from '../../repositories/mensajesRepository';
 import { formatearFecha, hoyISO, soloHora } from '../../utils/fechas';
 import { NOMBRES_ROL } from '../../config/estados';
+import { TIEMPO_REAL } from '../../config/tiempoReal';
 import { COLORES, ESPACIO, RADIO } from '../../config/tema';
 
 /**
@@ -17,7 +18,11 @@ import { COLORES, ESPACIO, RADIO } from '../../config/tema';
  * El botón "Nuevo mensaje" abre la lista de contactos permitidos para el rol.
  */
 export default function MensajesView({ navigation }) {
-  const conversaciones = useConsulta(() => MensajesRepository.conversaciones(), []);
+  // Tiempo real: la lista se actualiza sola (último mensaje y globos de no leídos).
+  const conversaciones = useConsulta(() => MensajesRepository.conversaciones(), [], {
+    actualizarCada: TIEMPO_REAL.CONVERSACIONES_MS,
+    tiposPush: ['MENSAJE'],
+  });
 
   return (
     <Pantalla

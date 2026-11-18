@@ -9,9 +9,15 @@ export const MensajesApi = {
   /** GET /mensajes/conversaciones → [{ id_conversacion, contacto, ultimo_mensaje, no_leidos }] */
   conversaciones: async () => (await apiClient.get('/mensajes/conversaciones')).data,
 
-  /** GET /mensajes/conversaciones/<id> → { contacto, mensajes: [{ contenido, mio, fecha_envio }] } */
-  conversacion: async (idConversacion) =>
-    (await apiClient.get(`/mensajes/conversaciones/${idConversacion}`)).data,
+  /**
+   * GET /mensajes/conversaciones/<id>[?desde=<id_mensaje>]
+   *   → { contacto, mensajes: [{ id_mensaje, contenido, mio, fecha_envio }], leidos_hasta }
+   * Con `desde` solo llegan los mensajes nuevos (lo usa el chat en tiempo real).
+   */
+  conversacion: async (idConversacion, desde = null) =>
+    (await apiClient.get(`/mensajes/conversaciones/${idConversacion}`, {
+      params: desde ? { desde } : undefined,
+    })).data,
 
   /** POST /mensajes/conversaciones → { id_usuario, contenido } (primer mensaje a un contacto) */
   iniciar: async (idUsuario, contenido, idOperacion) =>
@@ -31,11 +37,28 @@ export const MensajesApi = {
   /** GET /notificaciones → { no_leidas, notificaciones: [...] } */
   notificaciones: async () => (await apiClient.get('/notificaciones')).data,
 
+  /** GET /notificaciones/contadores → { mensajes_no_leidos, notificaciones_no_leidas } (liviano) */
+  contadores: async () => (await apiClient.get('/notificaciones/contadores')).data,
+
   /** PATCH /notificaciones/<id>/leida */
   marcarNotificacionLeida: async (id) => (await apiClient.patch(`/notificaciones/${id}/leida`)).data,
 
   /** PATCH /notificaciones/leer-todas */
   marcarTodasLeidas: async () => (await apiClient.patch('/notificaciones/leer-todas')).data,
+
+  /**
+   * GET /notificaciones/preferencias
+   *   → { silenciar_todo, pausado_hasta, no_molestar: {desde, hasta} | null,
+   *       tipos: [{ tipo, nombre, descripcion, activo }], opciones_pausa_horas, recibe_ahora }
+   */
+  preferencias: async () => (await apiClient.get('/notificaciones/preferencias')).data,
+
+  /**
+   * PUT /notificaciones/preferencias (todo opcional; lo que no se envía queda igual)
+   *   { silenciar_todo, tipos_silenciados: ['CLASE'], pausar_horas: 8 (0 = quitar),
+   *     no_molestar_desde: '22:00', no_molestar_hasta: '07:00' (null = sin horario) }
+   */
+  guardarPreferencias: async (datos) => (await apiClient.put('/notificaciones/preferencias', datos)).data,
 
   // --- Dispositivos (Push Tokens) -------------------------------------------------------
   /** POST /dispositivos/token → { token, plataforma } */

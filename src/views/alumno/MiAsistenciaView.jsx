@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
 import Lista, { ItemLista } from '../../components/Lista';
 import Texto from '../../components/Texto';
@@ -10,7 +10,7 @@ import { Vacio } from '../../components/Estados';
 import useConsulta from '../../viewmodels/useConsulta';
 import AsistenciaRepository from '../../repositories/asistenciaRepository';
 import { formatearFecha, nombreDia } from '../../utils/fechas';
-import { ESTADOS_ASISTENCIA, infoEstado } from '../../config/estados';
+import { etiquetasAsistencia } from '../../config/estados';
 import { COLORES, ESPACIO } from '../../config/tema';
 
 const NOMBRES_MES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto',
@@ -63,17 +63,19 @@ export default function MiAsistenciaView() {
               <Vacio icono="calendar-outline" titulo="Sin registros" />
             ) : (
               <Lista>
-                {registros.map((x) => {
-                  const estado = infoEstado(ESTADOS_ASISTENCIA, x.estado);
-                  return (
-                    <ItemLista
-                      key={x.fecha}
-                      titulo={`${nombreDia(x.fecha)}, ${formatearFecha(x.fecha)}`}
-                      subtitulo={x.observacion}
-                      derecha={<Etiqueta texto={estado.texto} tono={estado.tono} />}
-                    />
-                  );
-                })}
+                {registros.map((x) => (
+                  <ItemLista
+                    key={x.fecha}
+                    titulo={`${nombreDia(x.fecha)}, ${formatearFecha(x.fecha)}`}
+                    subtitulo={x.observacion}
+                    // Una justificada muestra las dos: "Tardanza" + "Justificada".
+                    derecha={(
+                      <View style={estilos.etiquetas}>
+                        {etiquetasAsistencia(x).map((e) => <Etiqueta key={e.texto} texto={e.texto} tono={e.tono} />)}
+                      </View>
+                    )}
+                  />
+                ))}
               </Lista>
             )}
           </>
@@ -85,4 +87,5 @@ export default function MiAsistenciaView() {
 
 const estilos = StyleSheet.create({
   porcentaje: { marginBottom: ESPACIO.xs },
+  etiquetas: { alignItems: 'flex-end', gap: 4 },
 });
