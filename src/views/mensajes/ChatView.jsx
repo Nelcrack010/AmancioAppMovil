@@ -66,8 +66,16 @@ export default function ChatView({ navigation, route }) {
         {chat.enviandose.map((m) => (
           <Burbuja key={m.clave} mio pendiente texto={m.contenido} pie="Enviando..." />
         ))}
-        {chat.enCola.map((m, i) => (
-          <Burbuja key={`cola-${i}`} mio pendiente texto={m.contenido} pie="Pendiente · se enviará al volver la red" />
+        {chat.enCola.map((m) => (
+          <Burbuja
+            key={m.idOperacion}
+            mio
+            pendiente
+            texto={m.contenido}
+            pie={m.estado === 'ERROR'
+              ? 'No se pudo enviar · revisa «Operaciones pendientes»'
+              : 'Pendiente · se enviará al volver la red'}
+          />
         ))}
       </ScrollView>
 

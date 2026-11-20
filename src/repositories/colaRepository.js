@@ -43,7 +43,8 @@ let sincronizando = false;
 export const ColaRepository = {
   /**
    * Envía una operación o, si no hay conexión, la deja pendiente.
-   * Devuelve { enviado: true, respuesta } o { enviado: false } (quedó pendiente).
+   * Devuelve { enviado: true, respuesta } o { enviado: false, idOperacion } (quedó pendiente;
+   * con idOperacion la pantalla puede saber cuándo se envió, ver useChatViewModel).
    * Los errores del servidor (400, 403, 409...) se lanzan para que el usuario los corrija.
    */
   async enviar(tipo, payload, descripcion) {
@@ -61,7 +62,7 @@ export const ColaRepository = {
         descripcion,
       });
       avisarCambios();
-      return { enviado: false };
+      return { enviado: false, idOperacion };
     }
   },
 

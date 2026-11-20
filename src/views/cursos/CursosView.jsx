@@ -29,7 +29,7 @@ export default function CursosView({ navigation }) {
               icono="book"
               titulo={c.curso}
               subtitulo={esDocente ? `${c.grado} ${c.seccion} · ${c.nivel}` : c.docente}
-              detalle={`${c.area} · ${c.anio}`}
+              detalle={[c.area, c.anio].filter(Boolean).join(' · ')}
               onPress={() => navigation.navigate('CursoDetalle', {
                 idCarga: c.id_carga_academica,
                 titulo: esDocente ? `${c.curso} · ${c.grado} ${c.seccion}` : c.curso,

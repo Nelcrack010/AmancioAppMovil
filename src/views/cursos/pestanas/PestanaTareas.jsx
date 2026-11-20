@@ -23,7 +23,12 @@ export default function PestanaTareas({ idCarga, esDocente, navigation }) {
   const tareas = useConsulta(() => AcademicoRepository.tareas(idCarga), [idCarga]);
 
   const eliminar = async (tarea) => {
-    if (!await confirmar('Eliminar tarea', `Se eliminará "${tarea.titulo}" y sus entregas.`, { textoAceptar: 'Eliminar', peligroso: true })) return;
+    // El servidor no deja borrar una tarea que ya tiene entregas (se perderían las notas).
+    if (tarea.entregas > 0) {
+      avisar('No se puede eliminar', `"${tarea.titulo}" ya tiene ${tarea.entregas} entrega(s).`);
+      return;
+    }
+    if (!await confirmar('Eliminar tarea', `Se eliminará "${tarea.titulo}".`, { textoAceptar: 'Eliminar', peligroso: true })) return;
     try {
       await AcademicoRepository.eliminarTarea(tarea.id_tarea);
       tareas.recargar();

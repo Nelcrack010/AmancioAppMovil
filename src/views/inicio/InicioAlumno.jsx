@@ -24,7 +24,10 @@ export default function InicioAlumno({ datos, navigation }) {
   return (
     <>
       <FilaDatos>
-        <Dato valor={datos.conducta?.nota} rotulo={`Conducta · ${datos.conducta?.bimestre}° bim.`} />
+        <Dato
+          valor={datos.conducta?.nota}
+          rotulo={datos.conducta?.bimestre ? `Conducta · ${datos.conducta.bimestre}° bim.` : 'Conducta'}
+        />
         <Dato valor={datos.asistencia?.F} rotulo="Faltas" color={COLORES.error} />
         <Dato valor={datos.asistencia?.T} rotulo="Tardanzas" color={COLORES.alerta} />
       </FilaDatos>

@@ -3,6 +3,7 @@ import useConsulta from './useConsulta';
 import useAccion from './useAccion';
 import AsistenciaRepository from '../repositories/asistenciaRepository';
 import AcademicoRepository from '../repositories/academicoRepository';
+import CacheRepository from '../repositories/cacheRepository';
 import { esFechaValida, hoyISO } from '../utils/fechas';
 import { JUSTIFICADA, tocarAsistencia } from '../config/estados';
 
@@ -108,6 +109,16 @@ export function useRegistroAsistenciaViewModel(idSeccionInicial) {
       datos, `Asistencia de ${nombreSeccion()} del ${fecha}`,
     ));
     if (!r.ok) return null;
+    // Sin conexión quedó en la cola: se guarda en el celular como "lo registrado ese día".
+    // Si no, al recargar volvían las marcas viejas (o todos presentes) y parecía perdido.
+    if (!r.resultado.enviado) {
+      await CacheRepository.guardarLocal(AsistenciaRepository.deSeccion(idSeccion, fecha), {
+        ...(registrado.datos || {}),
+        fecha,
+        registrada: true,
+        registros: datos.registros.map((x) => ({ ...x, estado_original: x.estado_original ?? null })),
+      });
+    }
     setHayCambios(false);
     registrado.recargar();
     return r.resultado;

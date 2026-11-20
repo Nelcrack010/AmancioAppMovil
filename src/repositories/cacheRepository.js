@@ -30,10 +30,14 @@ export const CacheRepository = {
     }
   },
 
-  /** Guarda en el celular datos que la pantalla armó (por ejemplo, el chat con los mensajes nuevos). */
+  /**
+   * Guarda en el celular datos que la pantalla armó (por ejemplo, el chat con los mensajes
+   * nuevos). Devuelve una promesa por si hay que esperar a que quede guardado; nunca falla.
+   */
   guardarLocal({ clave }, datos) {
     const id = idUsuarioActual();
-    if (id && clave) CacheDao.guardar(id, clave, datos).catch(() => {});
+    if (!id || !clave) return Promise.resolve();
+    return CacheDao.guardar(id, clave, datos).catch(() => {});
   },
 
   /** Pide los datos al servidor y los guarda en el celular. Lanza ErrorApi si falla. */

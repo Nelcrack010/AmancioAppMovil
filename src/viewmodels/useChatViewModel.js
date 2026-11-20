@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import CacheRepository from '../repositories/cacheRepository';
+import ColaRepository, { suscribirCambiosCola } from '../repositories/colaRepository';
 import MensajesRepository from '../repositories/mensajesRepository';
 import { useSesion } from '../context/SesionContext';
 import { fijarChatAbierto } from '../services/notificacionesPushService';
@@ -24,7 +25,8 @@ import { TIEMPO_REAL } from '../config/tiempoReal';
  *   3. Respaldo: si el WebSocket no está conectado, cada TIEMPO_REAL.CHAT_MS se piden
  *      SOLO los mensajes nuevos (?desde=<último id>).
  *   4. Al enviar, el mensaje aparece enseguida como "Enviando..." (sin esperar al servidor).
- * Los mensajes enviados sin conexión quedan en `enCola` marcados como pendientes.
+ * Los mensajes enviados sin conexión quedan en `enCola` marcados como pendientes; cuando la
+ * cola los envía (al volver la red), se quitan de ahí y aparecen como mensajes normales.
  */
 export function useChatViewModel({ idConversacionInicial, contacto }) {
   const { refrescarContadores } = useSesion();
@@ -35,6 +37,8 @@ export function useChatViewModel({ idConversacionInicial, contacto }) {
   const [enviandose, setEnviandose] = useState([]);     // mensajes que se están enviando ahora
   const [enCola, setEnCola] = useState([]);             // mensajes guardados sin conexión
   const datosRef = useRef(null);                        // última versión de `datos` (para el intervalo)
+  const enColaRef = useRef([]);
+  useEffect(() => { enColaRef.current = enCola; }, [enCola]);
 
   /** Reemplaza los datos (y los guarda en el celular para abrir el chat sin conexión). */
   const fijarDatos = useCallback((nuevos) => {
@@ -65,7 +69,14 @@ export function useChatViewModel({ idConversacionInicial, contacto }) {
       setCargando(false);
     }
     try {
-      const nuevos = await CacheRepository.actualizar(fuente);
+      const delServidor = await CacheRepository.actualizar(fuente);
+      // Mensajes que llegaron por WebSocket MIENTRAS se cargaba: no se pierden.
+      const ultimo = delServidor.mensajes.length
+        ? delServidor.mensajes[delServidor.mensajes.length - 1].id_mensaje : 0;
+      const llegaronMientras = (datosRef.current?.mensajes || []).filter((m) => m.id_mensaje > ultimo);
+      const nuevos = llegaronMientras.length
+        ? { ...delServidor, mensajes: [...delServidor.mensajes, ...llegaronMientras] }
+        : delServidor;
       datosRef.current = nuevos;
       setDatos(nuevos);
       setError(null);
@@ -145,6 +156,44 @@ export function useChatViewModel({ idConversacionInicial, contacto }) {
     };
   }, [idConversacion, fijarDatos, marcarLeidos]);
 
+  // MENSAJES SIN CONEXIÓN: cuando la cola cambia (se envió o el servidor rechazó algo), se
+  // revisa cuáles de los mensajes pendientes de este chat siguen en la cola. Los que ya se
+  // enviaron se quitan (si no, se veían dos veces: "Pendiente" y el mensaje real) y se traen
+  // los mensajes reales. Si era el PRIMER mensaje a un contacto, se busca la conversación
+  // que el servidor acaba de crear.
+  useEffect(() => {
+    if (enCola.length === 0) return undefined;
+    let activo = true;
+    const revisar = async () => {
+      const estados = new Map((await ColaRepository.listar()).map((op) => [op.id_operacion, op.estado]));
+      if (!activo) return;
+      const antes = enColaRef.current;
+      const ahora = antes
+        .filter((m) => estados.has(m.idOperacion))
+        .map((m) => ({ ...m, estado: estados.get(m.idOperacion) }));
+      const cambio = ahora.length !== antes.length || ahora.some((m, i) => m.estado !== antes[i].estado);
+      if (!cambio) return;
+      setEnCola(ahora);
+      if (ahora.length === antes.length) return;      // solo cambió el estado (rechazado)
+      try {
+        if (idConversacion) {
+          await traerNuevos();
+        } else if (contacto?.id_usuario) {
+          const lista = await MensajesRepository.conversaciones().cargarDeApi();
+          const nueva = lista.find((c) => c.id_contacto === contacto.id_usuario);
+          if (activo && nueva) setIdConversacion(nueva.id_conversacion);
+        }
+      } catch {
+        // sin red: se verá al volver a abrir el chat
+      }
+    };
+    const dejarDeEscuchar = suscribirCambiosCola(revisar);
+    return () => {
+      activo = false;
+      dejarDeEscuchar();
+    };
+  }, [enCola.length, idConversacion, contacto, traerNuevos]);
+
   /** Envía un mensaje. Devuelve true si se aceptó (enviado o guardado en la cola). */
   const enviar = useCallback(async (contenido) => {
     const texto = contenido.trim();
@@ -164,7 +213,9 @@ export function useChatViewModel({ idConversacionInicial, contacto }) {
         if (!idConversacion) setIdConversacion(resultado.respuesta.id_conversacion);
         else await traerNuevos();
       } else {
-        setEnCola((cola) => [...cola, { contenido: texto, fecha: new Date().toISOString() }]);
+        setEnCola((cola) => [...cola, {
+          contenido: texto, fecha: new Date().toISOString(), idOperacion: resultado.idOperacion, estado: 'PENDIENTE',
+        }]);
       }
       return true;
     } catch (e) {

@@ -21,7 +21,10 @@ export default function ResumenConducta({ datos, alAnular }) {
   return (
     <>
       <Tarjeta destacada>
-        <Texto variante="etiqueta" color={COLORES.crema}>Nota de conducta · {datos.bimestre_actual}° bimestre</Texto>
+        {/* Antes del primer bimestre no hay bimestre actual: no se muestra "null° bimestre". */}
+        <Texto variante="etiqueta" color={COLORES.crema}>
+          Nota de conducta{datos.bimestre_actual ? ` · ${datos.bimestre_actual}° bimestre` : ''}
+        </Texto>
         <Texto variante="titulo" color={COLORES.blanco} style={estilos.nota}>{datos.nota_actual} / 20</Texto>
         <Texto variante="pequeno" color={COLORES.crema}>Empieza en 20 cada bimestre y baja con cada falta.</Texto>
       </Tarjeta>

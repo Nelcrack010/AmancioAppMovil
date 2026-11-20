@@ -91,6 +91,12 @@ export default function RegistrarAsistenciaView({ route }) {
         <Aviso tono="exito">La asistencia de este día ya está registrada. Puedes corregirla y volver a confirmar.</Aviso>
       )}
       {vm.registrado.aviso && <Aviso tono="alerta" icono="cloud-offline">{vm.registrado.aviso}</Aviso>}
+      {vm.registrado.error && (
+        <Aviso tono="alerta" icono="cloud-offline">
+          No se pudo revisar si este día ya tenía asistencia ({vm.registrado.error.message}). Si confirmas,
+          lo que marques reemplazará lo que hubiera registrado.
+        </Aviso>
+      )}
       {vm.hayCambios && <Aviso tono="alerta">Tienes cambios sin guardar.</Aviso>}
       {vm.error && <Aviso tono="error">{vm.error}</Aviso>}
 

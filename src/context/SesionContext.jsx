@@ -1,4 +1,6 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext, useCallback, useContext, useEffect, useMemo, useRef, useState,
+} from 'react';
 import { obtenerToken, registrarAlExpirarSesion } from '../services/api/apiClient';
 import MensajesApi from '../services/api/mensajesApi';
 import Almacenamiento from '../services/almacenamiento';
@@ -45,8 +47,12 @@ export function SesionProvider({ children }) {
 
   // Si el servidor responde 401 (token vencido), se vuelve al inicio de sesión
   // SIN borrar las operaciones pendientes (se enviarán al volver a entrar).
+  // Mientras el usuario cierra sesión a mano, un 401 (por ejemplo, del propio logout con
+  // un token ya vencido) no debe mostrar "Tu sesión expiró".
+  const cerrandoSesion = useRef(false);
   useEffect(() => {
     registrarAlExpirarSesion(async () => {
+      if (cerrandoSesion.current) return;
       await SesionRepository.cerrarSesion({ borrarDatos: false });
       setUsuario(null);
       setSesionVencida(true);
@@ -62,9 +68,15 @@ export function SesionProvider({ children }) {
   }, []);
 
   const cerrarSesion = useCallback(async () => {
-    await SesionRepository.cerrarSesion({ borrarDatos: true });
-    setUsuario(null);
-    setContadores(CONTADORES_VACIOS);
+    cerrandoSesion.current = true;
+    try {
+      await SesionRepository.cerrarSesion({ borrarDatos: true });
+    } finally {
+      cerrandoSesion.current = false;
+      setUsuario(null);
+      setSesionVencida(false);
+      setContadores(CONTADORES_VACIOS);
+    }
   }, []);
 
   const cambiarPassword = useCallback(async (actual, nueva) => {

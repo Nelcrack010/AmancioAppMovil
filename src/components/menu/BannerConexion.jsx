@@ -20,8 +20,8 @@ export default function BannerConexion() {
   let texto;
   if (!enLinea) {
     texto = pendientes > 0
-      ? `Sin conexión · ${pendientes} operación(es) pendiente(s)`
-      : 'Sin conexión · mostrando datos guardados';
+      ? `Sin conexión con el servidor · ${pendientes} operación(es) pendiente(s)`
+      : 'Sin conexión con el servidor · mostrando datos guardados';
   } else if (sincronizando) {
     texto = `Enviando ${pendientes} operación(es) pendiente(s)...`;
   } else if (conError > 0) {
