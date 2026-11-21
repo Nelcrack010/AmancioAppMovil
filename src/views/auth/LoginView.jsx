@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Texto from '../../components/Texto';
 import Campo from '../../components/Campo';
 import Boton from '../../components/Boton';
+import DialogoTexto from '../../components/DialogoTexto';
 import { Aviso } from '../../components/Estados';
 import { useSesion } from '../../context/SesionContext';
 import useAccion from '../../viewmodels/useAccion';
+import {
+  cambiarServidor, esperarServidor, normalizarServidor, probarServidor, servidorActual,
+} from '../../services/servidor';
 import { validarTexto, primerError } from '../../utils/validaciones';
 import { NOMBRE_APP } from '../../config/constants';
 import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
@@ -16,6 +20,9 @@ import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
  * LoginView: inicio de sesión con usuario y contraseña.
  * Arriba, el bloque guinda con el logo (como la portada del login del campus web);
  * abajo, la tarjeta blanca con el formulario.
+ *
+ * Al pie, "Servidor: ... · Cambiar": la dirección del backend. Así el mismo APK sirve en
+ * cualquier PC, escribiendo su IP (ver src/services/servidor.js).
  */
 export default function LoginView() {
   const { iniciarSesion, sesionVencida } = useSesion();
@@ -24,6 +31,13 @@ export default function LoginView() {
   const [clave, setClave] = useState('');
   const [verClave, setVerClave] = useState(false);
   const [errorLocal, setErrorLocal] = useState(null);
+  const [servidor, setServidor] = useState(servidorActual());
+  const [editandoServidor, setEditandoServidor] = useState(false);
+
+  // La dirección guardada se lee al abrir la app: mostrarla cuando esté lista.
+  useEffect(() => {
+    esperarServidor().then(() => setServidor(servidorActual()));
+  }, []);
 
   const entrar = async () => {
     // 1. Validación local, antes de llamar a la API.
@@ -36,6 +50,21 @@ export default function LoginView() {
 
     // 2. Llamar a la API. Si sale bien, AppNavigator cambia de pantalla solo.
     await accion.ejecutar(() => iniciarSesion(usuario.trim(), clave));
+  };
+
+  /** Prueba la dirección escrita y, si el backend responde, la guarda. Devuelve el error o null. */
+  const guardarServidor = async (texto) => {
+    const url = normalizarServidor(texto);
+    if (!/^https?:\/\/[^\s/]+$/i.test(url)) {
+      return 'Escribe una dirección como http://192.168.1.20:5000';
+    }
+    if (!await probarServidor(url)) {
+      return `No responde ${url}. Revisa que el backend esté encendido y que el celular esté en la misma red que la PC.`;
+    }
+    await cambiarServidor(url);
+    setServidor(url);
+    accion.limpiarError();
+    return null;
   };
 
   const mensajeError = errorLocal || accion.error;
@@ -98,8 +127,35 @@ export default function LoginView() {
               En tu primer ingreso la contraseña es tu DNI y deberás cambiarla.
             </Texto>
           </View>
+
+          {/* Dirección del backend: se puede cambiar sin volver a compilar el APK. */}
+          <Pressable
+            onPress={() => setEditandoServidor(true)}
+            style={estilos.servidor}
+            accessibilityRole="button"
+            accessibilityLabel={`Servidor ${servidor}. Cambiar`}
+          >
+            <Ionicons name="server-outline" size={14} color={COLORES.textoSecundario} />
+            <Texto variante="diminuto" numberOfLines={1} style={estilos.textoServidor}>Servidor: {servidor}</Texto>
+            <Texto variante="diminuto" negrita color={COLORES.azul}>Cambiar</Texto>
+          </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <DialogoTexto
+        visible={editandoServidor}
+        titulo="Servidor"
+        mensaje="Dirección del backend: la IP de la PC donde corre python run.py, por ejemplo http://192.168.1.20:5000. El celular debe estar en la misma red WiFi que la PC."
+        etiqueta="Dirección del servidor"
+        valorInicial={servidor}
+        minimo={4}
+        maximo={200}
+        multilinea={false}
+        propsCampo={{ autoCapitalize: 'none', autoCorrect: false, keyboardType: 'url' }}
+        textoAceptar="Probar y guardar"
+        alAceptar={guardarServidor}
+        alCerrar={() => setEditandoServidor(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -129,4 +185,15 @@ const estilos = StyleSheet.create({
   subtitulo: { marginBottom: ESPACIO.lg },
   ojo: { position: 'absolute', right: ESPACIO.sm, top: 30, padding: ESPACIO.sm },
   nota: { marginTop: ESPACIO.lg },
+  servidor: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: ESPACIO.xs,
+    marginHorizontal: ESPACIO.lg,
+    marginTop: ESPACIO.lg,
+    marginBottom: ESPACIO.xl,
+    padding: ESPACIO.sm,
+  },
+  textoServidor: { flexShrink: 1 },
 });

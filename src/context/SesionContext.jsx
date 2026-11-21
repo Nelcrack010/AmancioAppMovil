@@ -13,6 +13,7 @@ import {
   conectarTiempoReal, desconectarTiempoReal, escucharTiempoReal,
 } from '../services/tiempoRealService';
 import { STORAGE_KEYS } from '../config/constants';
+import { esperarServidor } from '../services/servidor';
 import useTiempoReal from '../viewmodels/useTiempoReal';
 import { CUALQUIER_PUSH, TIEMPO_REAL } from '../config/tiempoReal';
 
@@ -118,8 +119,12 @@ export function SesionProvider({ children }) {
   useEffect(() => {
     if (!sesionLista) return undefined;
     let cancelado = false;
-    (obtenerToken() ? Promise.resolve(obtenerToken()) : Almacenamiento.leer(STORAGE_KEYS.AUTH_TOKEN))
-      .then((token) => { if (!cancelado) conectarTiempoReal(token); })
+    // Se espera a saber qué servidor usar (se puede cambiar en el login, ver servidor.js).
+    Promise.all([
+      obtenerToken() ? Promise.resolve(obtenerToken()) : Almacenamiento.leer(STORAGE_KEYS.AUTH_TOKEN),
+      esperarServidor(),
+    ])
+      .then(([token]) => { if (!cancelado) conectarTiempoReal(token); })
       .catch(() => {});
     const dejarDeEscuchar = escucharTiempoReal('notificacion', mostrarNotificacionLocal);
     return () => {

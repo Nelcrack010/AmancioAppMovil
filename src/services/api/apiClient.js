@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { API_CONFIG, STORAGE_KEYS } from '../../config/constants';
 import Almacenamiento from '../almacenamiento';
+import { esperarServidor } from '../servidor';
 
 /**
  * Cliente HTTP (Axios) de la API del campus. Equivale a la instancia de Retrofit en Android.
@@ -65,6 +66,9 @@ const MENSAJES_HTTP = {
 
 // --- 1. Interceptor de petición: agrega el JWT ----------------------------------------
 apiClient.interceptors.request.use(async (config) => {
+  // La dirección del servidor se puede cambiar en el login (src/services/servidor.js).
+  await esperarServidor();
+  config.baseURL = API_CONFIG.BASE_URL;
   if (!tokenActual) {
     try {
       const guardado = await Almacenamiento.leer(STORAGE_KEYS.AUTH_TOKEN);

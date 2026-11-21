@@ -55,6 +55,12 @@ mensajería en tiempo real, notificaciones, archivos, asistencia, etc.
 
 > `.env.local` no se sube a Git: cada uno pone su propia dirección.
 
+**C. Cambiar el servidor desde la app (sin tocar `.env.local` ni volver a compilar)**
+En la pantalla de inicio de sesión, abajo, toca **"Servidor: … · Cambiar"**, escribe la
+dirección del backend (por ejemplo `http://192.168.18.64:5000`) y toca **Probar y guardar**.
+La app comprueba que el backend responda (`GET /`) antes de guardarla, y la recuerda al
+volver a abrirse. Así el mismo **APK** sirve en cualquier PC.
+
 ### 3. Iniciar la app
 ```bash
 npx expo start -c --go
@@ -119,7 +125,7 @@ En el celular, cuando la app pida **permiso de notificaciones**, toca **Permitir
 |---|---|
 | Expo Go: *"Can't open this project"* | Inicia con `--go` (o presiona `s`) y vuelve a escanear. |
 | El QR no abre la app | Inicia sesión en Expo Go; con cable, usa `--localhost` y `adb reverse`. |
-| *"No hay conexión con el servidor"* | Revisa que el backend esté prendido, la dirección de `.env.local` (y reinicia con `-c`), el firewall o el `adb reverse`. |
+| *"No hay conexión con el servidor"* | Revisa que el backend esté prendido, la dirección de `.env.local` (y reinicia con `-c`) o la de **"Servidor: … · Cambiar"** en el login, el firewall o el `adb reverse`. |
 | Los mensajes tardan unos segundos | El WebSocket no conectó y la app usa el respaldo (pregunta cada 2,5 s). Revisa que el backend se haya iniciado con `python run.py` y que tenga `Flask-SocketIO` instalado (`pip install -r requirements.txt`). |
 | No suenan las notificaciones | *Ajustes → Aplicaciones → Expo Go → Notificaciones* → activarlas. La app también muestra un botón **"Activar notificaciones"** en *Avisos* si falta el permiso. |
 | No llegan con la pantalla apagada | Normal en Expo Go: Android pausa la app. Con la app cerrada o la pantalla apagada solo llegan push reales, que necesitan una *development build* y `PUSH_ACTIVO=1` en el backend. |

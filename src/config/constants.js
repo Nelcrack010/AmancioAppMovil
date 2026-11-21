@@ -5,6 +5,8 @@
  *   - Se puede cambiar SIN tocar el código con la variable EXPO_PUBLIC_API_URL en un
  *     archivo .env.local (no se sube a Git). Ver .env.example.
  *   - Si no está definida, se usa el servidor del equipo en Oracle Cloud.
+ *   - En la app se puede cambiar desde el inicio de sesión ("Servidor: ... · Cambiar"),
+ *     sin volver a compilar (ver src/services/servidor.js).
  */
 export const API_CONFIG = {
   BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'https://146.181.54.237',
@@ -21,6 +23,7 @@ export const STORAGE_KEYS = {
   AUTH_TOKEN: 'amancio_auth_token',
   USER_PROFILE: 'amancio_user_profile',
   PUSH_TOKEN: 'amancio_push_token',
+  SERVIDOR: 'amancio_servidor',   // dirección del backend elegida en el login (ver src/services/servidor.js)
 };
 
 /** Nombre visible de la app (cabeceras, pantalla de acceso). */

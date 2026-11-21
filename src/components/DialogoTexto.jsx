@@ -24,18 +24,19 @@ import { COLORES, ESPACIO, RADIO } from '../config/tema';
 export default function DialogoTexto({
   visible, titulo, mensaje, etiqueta, minimo = 1, maximo = 300, textoAceptar = 'Aceptar',
   peligroso = false, alAceptar, alCerrar,
+  valorInicial = '', multilinea = true, propsCampo = {},   // opcionales (ej. la dirección del servidor)
 }) {
-  const [texto, setTexto] = useState('');
+  const [texto, setTexto] = useState(valorInicial);
   const [error, setError] = useState(null);
   const [enviando, setEnviando] = useState(false);
 
-  // Cada vez que se abre, empieza vacío.
+  // Cada vez que se abre, empieza con el valor inicial (vacío por defecto).
   useEffect(() => {
     if (visible) {
-      setTexto('');
+      setTexto(valorInicial);
       setError(null);
     }
-  }, [visible]);
+  }, [visible, valorInicial]);
 
   const aceptar = async () => {
     const errorLocal = validarTexto(texto, etiqueta.toLowerCase(), { minimo, maximo });
@@ -58,7 +59,15 @@ export default function DialogoTexto({
           {/* Boolean(): un texto vacío ('') no se puede dibujar suelto dentro de un View */}
           {Boolean(mensaje) && <Texto variante="pequeno">{mensaje}</Texto>}
           {error && <Aviso tono="error">{error}</Aviso>}
-          <Campo etiqueta={etiqueta} valor={texto} alCambiar={setTexto} multilinea maxLength={maximo} autoFocus />
+          <Campo
+            etiqueta={etiqueta}
+            valor={texto}
+            alCambiar={setTexto}
+            multilinea={multilinea}
+            maxLength={maximo}
+            autoFocus
+            {...propsCampo}
+          />
           <View style={estilos.botones}>
             <Boton titulo="Cancelar" variante="texto" onPress={alCerrar} style={estilos.flex} />
             <Boton

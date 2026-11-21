@@ -3,23 +3,30 @@ import NetInfo from '@react-native-community/netinfo';
 import ColaRepository, { suscribirCambiosCola } from '../repositories/colaRepository';
 import { useSesion } from './SesionContext';
 import { API_CONFIG } from '../config/constants';
+import { escucharCambioServidor, esperarServidor } from '../services/servidor';
 
 // "Con conexión" significa que el celular llega a NUESTRO servidor, no a internet.
 // Por defecto NetInfo pregunta a Google: en local sin internet (el examen) decía
 // "Sin conexión" aunque el backend respondiera, y la cola nunca se enviaba sola.
 // Ahora se pregunta a GET / del backend (responde 200 si está encendido).
-try {
-  NetInfo.configure({
-    reachabilityUrl: `${API_CONFIG.BASE_URL}/`,
-    reachabilityTest: async (respuesta) => respuesta.status === 200,
-    reachabilityLongTimeout: 30 * 1000,    // con conexión: se revisa cada 30 s
-    reachabilityShortTimeout: 5 * 1000,    // sin conexión: cada 5 s (para notar que volvió)
-    reachabilityRequestTimeout: 8 * 1000,
-    useNativeReachability: false,          // usar la prueba de arriba también en Android
-  });
-} catch {
-  // Si no se puede configurar, se usa la detección por defecto.
+// Si se cambia la dirección del servidor en el login, se vuelve a configurar.
+function configurarDeteccion() {
+  try {
+    NetInfo.configure({
+      reachabilityUrl: `${API_CONFIG.BASE_URL}/`,
+      reachabilityTest: async (respuesta) => respuesta.status === 200,
+      reachabilityLongTimeout: 30 * 1000,    // con conexión: se revisa cada 30 s
+      reachabilityShortTimeout: 5 * 1000,    // sin conexión: cada 5 s (para notar que volvió)
+      reachabilityRequestTimeout: 8 * 1000,
+      useNativeReachability: false,          // usar la prueba de arriba también en Android
+    });
+  } catch {
+    // Si no se puede configurar, se usa la detección por defecto.
+  }
 }
+configurarDeteccion();
+esperarServidor().then(configurarDeteccion);
+escucharCambioServidor(configurarDeteccion);
 
 /**
  * ConexionContext: detecta si hay internet y lleva la cuenta de las operaciones pendientes.
