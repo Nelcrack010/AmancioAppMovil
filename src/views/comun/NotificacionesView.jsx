@@ -1,3 +1,36 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Notificaciones (avisos)   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: NotificacionesView: avisos del usuario (nueva tarea, calificación, cita, conducta, mensaje...). Los no
+//     leídos van en negrita con un punto guinda. Al tocar uno se marca como leído y se abre la pantalla
+//     relacionada.
+// Pantalla «Notificaciones» (src/navigation/pantallas.js): en el menú de ALUMNO («Avisos»), DOCENTE («Avisos»),
+//     AUXILIAR («Avisos»), PSICOLOGO («Avisos»), ADMIN («Avisos») (src/config/menus.js)
+// Desde aquí se va a: AjustesNotificaciones
+//
+// Datos (repositorio → endpoint → backend):
+//   MensajesRepository.marcarNotificacionLeida() → PATCH /notificaciones/<int:id_notificacion>/leida (backend:
+//       notificacion_routes.py → marcar_leida())
+//   MensajesRepository.marcarTodasLeidas() → PATCH /notificaciones/leer-todas (backend: notificacion_routes.py →
+//       marcar_todas())
+//   MensajesRepository.notificaciones() → GET /notificaciones (backend: notificacion_routes.py →
+//       mis_notificaciones())
+// Botones / secciones: «Configurar», «Sin avisos»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
@@ -23,6 +56,9 @@ import { CUALQUIER_PUSH, TIEMPO_REAL } from '../../config/tiempoReal';
 export default function NotificacionesView({ navigation }) {
   const { usuario, refrescarContadores } = useSesion();
   // Tiempo real: los avisos nuevos aparecen solos (y al instante si llega un push).
+  // PISTA: «consulta» = datos que se cargan al abrir la pantalla: MensajesRepository.notificaciones() → GET
+  //     /notificaciones (backend: notificacion_routes.py → mis_notificaciones()). Úsalos con consulta.datos;
+  //     consulta.recargar() vuelve a pedirlos.
   const consulta = useConsulta(() => MensajesRepository.notificaciones(), [], {
     actualizarCada: TIEMPO_REAL.AVISOS_MS,
     tiposPush: CUALQUIER_PUSH,
@@ -52,6 +88,8 @@ export default function NotificacionesView({ navigation }) {
     }
   };
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla consulta={consulta}>
       {(datos) => (datos.notificaciones.length === 0 ? (
@@ -102,6 +140,7 @@ function BotonAjustes({ alTocar }) {
   return <Boton titulo="Configurar" icono="settings-outline" variante="texto" pequeno onPress={alTocar} />;
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   acciones: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: ESPACIO.xs,

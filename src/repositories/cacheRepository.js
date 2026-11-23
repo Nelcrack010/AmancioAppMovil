@@ -1,3 +1,22 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: REPOSITORY · de dónde salen los datos: caché del celular, la API o la cola sin conexión
+// Cadena: vistas/viewmodels → [este archivo] → services/api/*Api.js → backend
+//
+// Métodos (→ endpoint · lo usan):
+//   leerLocal()  → solo en el celular  · lo usan: useChatViewModel.js, useConsulta.js
+//   guardarLocal()  → solo en el celular  · lo usan: useChatViewModel.js, useRegistroAsistenciaViewModel.js
+//   actualizar()  → solo en el celular  · lo usan: useChatViewModel.js, useConsulta.js
+//
+// Para modificar:
+//   • CONSULTA (mostrar datos): metodo: (a) => fuente(`clave:${a}`, () => XApi.metodo(a)),
+//     la clave de caché debe cambiar si cambia el parámetro (si no, se ven datos de otro filtro).
+//   • ACCIÓN (guardar/borrar): metodo: XApi.metodo,   (se pasa tal cual).
+//   • Que funcione sin conexión: ColaRepository.enviar('TIPO', payload, descripcion) + agregar TIPO en ENVIOS
+//       (colaRepository.js).
+//
+// Para modificar:
+//   fuente(clave, fn): guarda la última respuesta en el celular y la muestra primero.
+// <<< FIN GUÍA
 import CacheDao from '../database/dao/cacheDao';
 import { idUsuarioActual } from './sesionRepository';
 
@@ -19,6 +38,7 @@ export function fuente(clave, cargarDeApi) {
 }
 
 export const CacheRepository = {
+  // PISTA: leerLocal() → solo en el celular · lo usan: useChatViewModel.js, useConsulta.js
   /** Lo guardado en el celular: { valor, actualizado_en } o null. */
   async leerLocal({ clave }) {
     const id = idUsuarioActual();
@@ -30,6 +50,7 @@ export const CacheRepository = {
     }
   },
 
+  // PISTA: guardarLocal() → solo en el celular · lo usan: useChatViewModel.js, useRegistroAsistenciaViewModel.js
   /**
    * Guarda en el celular datos que la pantalla armó (por ejemplo, el chat con los mensajes
    * nuevos). Devuelve una promesa por si hay que esperar a que quede guardado; nunca falla.
@@ -40,6 +61,7 @@ export const CacheRepository = {
     return CacheDao.guardar(id, clave, datos).catch(() => {});
   },
 
+  // PISTA: actualizar() → solo en el celular · lo usan: useChatViewModel.js, useConsulta.js
   /** Pide los datos al servidor y los guarda en el celular. Lanza ErrorApi si falla. */
   async actualizar({ clave, cargarDeApi }) {
     const datos = await cargarDeApi();

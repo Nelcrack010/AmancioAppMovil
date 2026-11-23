@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Abrir la pantalla relacionada con una notificación.
+// Lo usan: MenuNavigator.jsx, AjustesNotificacionesView.jsx, NotificacionesView.jsx
+// <<< FIN GUÍA
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';

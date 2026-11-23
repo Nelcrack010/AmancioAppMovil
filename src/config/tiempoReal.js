@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Tiempo real: mensajes, avisos y globos de no leídos al instante.
+// Lo usan: SesionContext.jsx, useChatViewModel.js, useTiempoReal.js, NotificacionesView.jsx, MensajesView.jsx
+// <<< FIN GUÍA
 /**
  * Tiempo real: mensajes, avisos y globos de no leídos al instante.
  *

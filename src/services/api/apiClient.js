@@ -1,3 +1,12 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Cliente HTTP (Axios) de la API del campus. Equivale a la instancia de Retrofit en Android.
+// Lo usan: SesionContext.jsx, sesionRepository.js, academicoApi.js, asistenciaApi.js, authApi.js,
+//     conductaApi.js, cursosApi.js, mensajesApi.js (+2 más)
+//
+// Para modificar:
+//   axios con la URL del servidor y el token. Traduce los errores {detail} a mensajes.
+//   Casi nunca se toca: los endpoints van en los archivos *Api.js.
+// <<< FIN GUÍA
 import axios from 'axios';
 import { API_CONFIG, STORAGE_KEYS } from '../../config/constants';
 import Almacenamiento from '../almacenamiento';

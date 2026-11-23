@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Almacenamiento seguro clave-valor para la sesión (token JWT y datos del usuario).
+// Lo usan: SesionContext.jsx, mensajesRepository.js, sesionRepository.js, apiClient.js, servidor.js
+// <<< FIN GUÍA
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 

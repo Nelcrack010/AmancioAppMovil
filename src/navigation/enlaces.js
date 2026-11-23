@@ -1,3 +1,8 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Enlaces profundos (deep links): abrir una pantalla de la app desde un enlace como
+//     amancioapp://tarea/5  o  amancioapp://chat/3.
+// Lo usan: App.jsx
+// <<< FIN GUÍA
 import * as Linking from 'expo-linking';
 
 /**

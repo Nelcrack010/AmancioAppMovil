@@ -1,3 +1,8 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Tipos de notificación: el ícono que se muestra en "Avisos" y la pantalla que se abre al tocar el aviso
+//     (tanto en la lista de Avisos como en la notificación push del celular).
+// Lo usan: abrirNotificacion.js, AjustesNotificacionesView.jsx
+// <<< FIN GUÍA
 /**
  * Tipos de notificación: el ícono que se muestra en "Avisos" y la pantalla que se abre
  * al tocar el aviso (tanto en la lista de Avisos como en la notificación push del celular).

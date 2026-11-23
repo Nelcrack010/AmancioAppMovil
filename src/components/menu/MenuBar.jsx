@@ -1,3 +1,12 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: MenuBar: barra de menú inferior (reemplaza al menú lateral del campus web).
+//   <MenuBar state, navigation, opciones />
+// Lo usan: MenuNavigator.jsx
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

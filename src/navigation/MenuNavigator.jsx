@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: MenuNavigator: las pantallas del menú del rol que inició sesión.
+// Lo usan: AppNavigator.jsx
+// <<< FIN GUÍA
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MenuBar from '../components/menu/MenuBar';

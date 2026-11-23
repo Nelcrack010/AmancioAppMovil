@@ -1,3 +1,27 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Mensajería   ·   Capa: VIEWMODEL · lógica de una pantalla (estado, cargar, guardar) separada del
+//     dibujo
+// Qué es: useChatViewModel: estado de una conversación EN TIEMPO REAL.
+// Lo usan: ChatView.jsx
+//
+// Datos (repositorio → endpoint → backend):
+//   CacheRepository.actualizar() → solo en el celular
+//   CacheRepository.guardarLocal() → solo en el celular
+//   CacheRepository.leerLocal() → solo en el celular
+//   ColaRepository.listar() → solo en el celular
+//   MensajesRepository.conversacion() → GET /mensajes/conversaciones/<int:id_conversacion> (backend:
+//       mensaje_routes.py → ver())
+//   MensajesRepository.conversaciones() → GET /mensajes/conversaciones (backend: mensaje_routes.py →
+//       conversaciones())
+//   MensajesRepository.enviar() → solo en el celular
+//   MensajesRepository.marcarLeida() → PATCH /mensajes/conversaciones/<int:id_conversacion>/leido (backend:
+//       mensaje_routes.py → marcar_leidos())
+//   MensajesRepository.mensajesNuevos() → GET /mensajes/conversaciones/<int:id_conversacion> (backend:
+//       mensaje_routes.py → ver())
+//
+// Para modificar: lo que la pantalla muestra se lee de lo que devuelve este hook (return { ... } al final).
+//   Un dato o acción nueva → agrégalo aquí y devuélvelo; luego úsalo en la pantalla.
+// <<< FIN GUÍA
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import CacheRepository from '../repositories/cacheRepository';

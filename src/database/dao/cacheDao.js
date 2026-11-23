@@ -1,3 +1,8 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: CacheDao: guarda y lee la última respuesta de cada consulta. Equivale a una interfaz @Dao de Room en
+//     Android.
+// Lo usan: cacheRepository.js, sesionRepository.js
+// <<< FIN GUÍA
 import { getDatabase, ES_WEB } from '../appDatabase';
 
 /**

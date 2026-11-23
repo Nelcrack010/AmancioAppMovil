@@ -1,3 +1,13 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: general   ·   Capa: VIEWMODEL · lógica de una pantalla (estado, cargar, guardar) separada del dibujo
+// Qué es: useAccion: ViewModel genérico para las acciones (guardar, enviar, calificar...).
+// Lo usan: useNotasCursoViewModel.js, useRegistroAsistenciaViewModel.js, SolicitarCitaView.jsx,
+//     CambiarPasswordView.jsx, LoginView.jsx, RegistrarReporteView.jsx, AjustesNotificacionesView.jsx,
+//     EditarPerfilView.jsx (+4 más)
+//
+// Para modificar: casi nunca se toca. En la pantalla: const r = await accion.ejecutar(() => Repo.metodo(...));
+//   if (r.ok) { ... }   accion.enviando → botón cargando · accion.error → Aviso rojo.
+// <<< FIN GUÍA
 import { useCallback, useState } from 'react';
 
 /**

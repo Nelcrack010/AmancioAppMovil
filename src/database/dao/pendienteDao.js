@@ -1,3 +1,8 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: PendienteDao: cola de operaciones hechas sin conexión. Las operaciones se guardan en orden y se envían
+//     en ese mismo orden al volver la red.
+// Lo usan: colaRepository.js, sesionRepository.js
+// <<< FIN GUÍA
 import { getDatabase, ES_WEB } from '../appDatabase';
 
 /**

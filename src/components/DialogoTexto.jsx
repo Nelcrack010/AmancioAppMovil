@@ -1,3 +1,15 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: DialogoTexto: ventana para pedir un texto antes de una acción (motivo de anulación, motivo de
+//     cancelación, observación de la atención...).
+//   <DialogoTexto visible, titulo, mensaje, etiqueta, minimo = 1, maximo = 300, textoAceptar = 'Aceptar',
+//       peligroso = false, alAceptar, alCerrar, valorInicial = '', multilinea = true, propsCampo = {}, //
+//       opcionales (ej. la dirección del servidor />
+// Lo usan: LoginView.jsx, ConductaAlumnoView.jsx, CitaDetalleView.jsx
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, StyleSheet, View } from 'react-native';
 import Texto from './Texto';

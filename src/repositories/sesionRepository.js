@@ -1,3 +1,23 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: REPOSITORY · de dónde salen los datos: caché del celular, la API o la cola sin conexión
+// Cadena: vistas/viewmodels → [este archivo] → services/api/*Api.js → backend
+//
+// Métodos (→ endpoint · lo usan):
+//   establecerToken()  → solo en el celular  · lo usan: —
+//   iniciarSesion()  → POST /usuarios/login  · lo usan: SesionContext.jsx, LoginView.jsx
+//   recuperarSesion()  → solo en el celular  · lo usan: SesionContext.jsx
+//   cambiarPassword()  → POST /perfil/auth/change-password  · lo usan: SesionContext.jsx,
+//       CambiarPasswordView.jsx
+//   cerrarSesion()  → POST /usuarios/logout, DELETE /dispositivos/token  · lo usan: MenuMas.jsx,
+//       SesionContext.jsx, CambiarPasswordView.jsx (+1 más)
+//
+// Para modificar:
+//   • CONSULTA (mostrar datos): metodo: (a) => fuente(`clave:${a}`, () => XApi.metodo(a)),
+//     la clave de caché debe cambiar si cambia el parámetro (si no, se ven datos de otro filtro).
+//   • ACCIÓN (guardar/borrar): metodo: XApi.metodo,   (se pasa tal cual).
+//   • Que funcione sin conexión: ColaRepository.enviar('TIPO', payload, descripcion) + agregar TIPO en ENVIOS
+//       (colaRepository.js).
+// <<< FIN GUÍA
 import Almacenamiento from '../services/almacenamiento';
 import { establecerToken, obtenerToken } from '../services/api/apiClient';
 import AuthApi from '../services/api/authApi';
@@ -26,11 +46,14 @@ async function guardarSesion(token, usuario) {
   promesaRecuperacion = null;
   await Almacenamiento.guardar(STORAGE_KEYS.AUTH_TOKEN, token);
   await Almacenamiento.guardar(STORAGE_KEYS.USER_PROFILE, JSON.stringify(usuario));
+  // PISTA: establecerToken() → solo en el celular · lo usan: —
   establecerToken(token);
   usuarioActual = usuario;
 }
 
 export const SesionRepository = {
+  // PISTA: iniciarSesion() → POST /usuarios/login (backend: auth_routes.py → login()) · lo usan:
+  //     SesionContext.jsx, LoginView.jsx
   /** Inicia sesión y devuelve el usuario. Lanza ErrorApi si las credenciales fallan. */
   async iniciarSesion(username, password) {
     const r = await AuthApi.login(username, password);
@@ -44,6 +67,7 @@ export const SesionRepository = {
     return usuario;
   },
 
+  // PISTA: recuperarSesion() → solo en el celular · lo usan: SesionContext.jsx
   /** Recupera la sesión guardada al abrir la app (o null si no había). */
   async recuperarSesion() {
     if (usuarioActual && obtenerToken()) {
@@ -70,6 +94,8 @@ export const SesionRepository = {
     return promesaRecuperacion;
   },
 
+  // PISTA: cambiarPassword() → POST /perfil/auth/change-password (backend: perfil_routes.py → change_password())
+  //     · lo usan: SesionContext.jsx, CambiarPasswordView.jsx
   /** Cambia la contraseña y quita la marca de "primer ingreso". */
   async cambiarPassword(actual, nueva) {
     await AuthApi.cambiarPassword(actual, nueva);
@@ -79,6 +105,9 @@ export const SesionRepository = {
     return usuario;
   },
 
+  // PISTA: cerrarSesion() → POST /usuarios/logout (backend: auth_routes.py → logout()); DELETE
+  //     /dispositivos/token (backend: dispositivo_routes.py → eliminar_token()) · lo usan: MenuMas.jsx,
+  //     SesionContext.jsx, CambiarPasswordView.jsx, PerfilView.jsx
   /**
    * Cierra la sesión del usuario.
    *

@@ -1,3 +1,14 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: Boton con los estilos del campus.
+//   <Boton titulo, onPress, variante = 'primario', icono, cargando = false, deshabilitado = false, pequeno =
+//       false, style />
+// Lo usan: AvisoPermisoNotificaciones.jsx, DialogoTexto.jsx, Estados.jsx, ResumenConducta.jsx, MisCitasView.jsx,
+//     SolicitarCitaView.jsx, CambiarPasswordView.jsx, LoginView.jsx (+16 más)
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

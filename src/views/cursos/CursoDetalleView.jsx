@@ -1,3 +1,27 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: general   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: CursoDetalleView: aula virtual de un curso, organizada en pestañas. - Estudiante: Tareas, Materiales y
+//     Clases virtuales. - Docente: lo mismo, más Estudiantes, y el botón "Notas" en la cabecera que abre el
+//     registro de notas.
+// Pantalla «CursoDetalle» (src/navigation/pantallas.js): pantalla de detalle, título «Curso»
+//   Se abre desde: CursosView.jsx, InicioAlumno.jsx  con navigation.navigate('CursoDetalle', {...})
+// Desde aquí se va a: NotasCurso
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useLayoutEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -52,6 +76,8 @@ export default function CursoDetalleView({ navigation, route }) {
 
   const props = { idCarga, esDocente, navigation };
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <View style={estilos.fondo}>
       <View style={estilos.barra}>
@@ -66,6 +92,7 @@ export default function CursoDetalleView({ navigation, route }) {
   );
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   fondo: { flex: 1, backgroundColor: COLORES.fondo },
   barra: { paddingTop: ESPACIO.md, paddingHorizontal: ESPACIO.lg },

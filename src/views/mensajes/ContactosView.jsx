@@ -1,3 +1,28 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Mensajería   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: Orden en que se agrupan los contactos.
+// Pantalla «Contactos» (src/navigation/pantallas.js): pantalla de detalle, título «Nuevo mensaje»
+//   Se abre desde: MensajesView.jsx  con navigation.navigate('Contactos', {...})
+//
+// Datos (repositorio → endpoint → backend):
+//   MensajesRepository.contactos() → GET /mensajes/contactos (backend: mensaje_routes.py → contactos())
+// Botones / secciones: «Sin resultados»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
@@ -18,9 +43,14 @@ const ORDEN_ROLES = ['DOCENTE', 'AUXILIAR', 'PSICOLOGO', 'ADMIN', 'ALUMNO'];
  * la reutiliza al enviar el primer mensaje.
  */
 export default function ContactosView({ navigation }) {
+  // PISTA: «contactos» = datos que se cargan al abrir la pantalla: MensajesRepository.contactos() → GET
+  //     /mensajes/contactos (backend: mensaje_routes.py → contactos()). Úsalos con contactos.datos;
+  //     contactos.recargar() vuelve a pedirlos.
   const contactos = useConsulta(() => MensajesRepository.contactos(), []);
   const [busqueda, setBusqueda] = useState('');
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla consulta={contactos}>
       {(lista) => {

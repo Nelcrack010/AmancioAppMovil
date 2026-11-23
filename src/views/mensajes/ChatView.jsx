@@ -1,3 +1,26 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: general   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: ChatView: mensajes de una conversación (burbujas propias a la derecha, en azul, como en el campus web)
+//     y caja para escribir. Se actualiza en tiempo real mientras está abierta (ver useChatViewModel).
+// Pantalla «Chat» (src/navigation/pantallas.js): pantalla de detalle, título «Conversación»
+//   Se abre desde: MensajesView.jsx  con navigation.navigate('Chat', {...})
+// Su lógica está en: useChatViewModel (src/viewmodels)
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View,
@@ -41,6 +64,8 @@ export default function ChatView({ navigation, route }) {
 
   if (chat.cargando) return <Cargando mensaje="Cargando conversación..." />;
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <KeyboardAvoidingView
       style={estilos.fondo}
@@ -106,6 +131,8 @@ export default function ChatView({ navigation, route }) {
 
 /** Burbuja de un mensaje. */
 function Burbuja({ mio, texto, pie, pendiente = false }) {
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <View style={[estilos.burbuja, mio ? estilos.mia : estilos.suya, pendiente && estilos.pendiente]}>
       <Texto color={mio ? COLORES.blanco : COLORES.texto}>{texto}</Texto>
@@ -116,6 +143,7 @@ function Burbuja({ mio, texto, pie, pendiente = false }) {
   );
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   fondo: { flex: 1, backgroundColor: COLORES.fondo },
   lista: { padding: ESPACIO.lg, gap: ESPACIO.sm, flexGrow: 1, justifyContent: 'flex-end' },

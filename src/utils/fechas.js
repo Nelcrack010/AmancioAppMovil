@@ -1,3 +1,11 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Utilidades de fechas.
+// Lo usan: Estados.jsx, Items.jsx, ResumenConducta.jsx, useNotasCursoViewModel.js,
+//     useRegistroAsistenciaViewModel.js, MiAsistenciaView.jsx, MisCitasView.jsx, MisNotasView.jsx (+23 más)
+//
+// Para modificar:
+//   formatearFecha, formatearFechaHora, hoyISO, esFechaValida... Úsalas para mostrar fechas.
+// <<< FIN GUÍA
 /**
  * Utilidades de fechas.
  *

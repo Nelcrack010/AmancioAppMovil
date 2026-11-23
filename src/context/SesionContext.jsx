@@ -1,3 +1,12 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: SesionContext: estado global de la sesión, disponible en toda la app con useSesion().
+// Lo usan: App.jsx, BotonesEncabezado.jsx, MenuBar.jsx, MenuMas.jsx, ConexionContext.jsx, AppNavigator.jsx,
+//     MenuNavigator.jsx, abrirNotificacion.js (+11 más)
+//
+// Para modificar:
+//   Usuario que inició sesión (usuario.rol, usuario.username) y contadores de no leídos.
+//   En una pantalla: const { usuario } = useSesion();
+// <<< FIN GUÍA
 import React, {
   createContext, useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from 'react';

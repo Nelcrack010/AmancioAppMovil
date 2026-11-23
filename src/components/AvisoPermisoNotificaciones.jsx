@@ -1,3 +1,14 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: Aviso que aparece SOLO si el celular no deja que la app muestre notificaciones (el usuario negó el
+//     permiso). Ofrece pedirlo otra vez o abrir los Ajustes del celular. Se revisa cada vez que la pantalla se
+//     abre (por ejemplo, al volver de Ajustes).
+//   <AvisoPermisoNotificaciones />
+// Lo usan: AjustesNotificacionesView.jsx, NotificacionesView.jsx
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React, { useCallback, useState } from 'react';
 import { Linking, StyleSheet, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';

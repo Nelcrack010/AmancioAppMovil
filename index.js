@@ -1,3 +1,8 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+//
+// Para modificar:
+//   Registra App.jsx como la app de Expo. No se toca.
+// <<< FIN GUÍA
 import { registerRootComponent } from 'expo';
 
 import App from './App.jsx';

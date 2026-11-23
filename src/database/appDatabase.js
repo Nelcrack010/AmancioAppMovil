@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Base de datos local del celular (SQLite). Equivale a la clase RoomDatabase en Android.
+// Lo usan: cacheDao.js, pendienteDao.js
+// <<< FIN GUÍA
 import { Platform } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 

@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: AppNavigator: decide qué ve el usuario según su sesión.
+// Lo usan: App.jsx
+// <<< FIN GUÍA
 import React from 'react';
 import { Pressable } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';

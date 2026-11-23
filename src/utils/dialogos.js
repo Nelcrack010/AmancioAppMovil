@@ -1,3 +1,11 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Diálogos de confirmación y aviso.
+// Lo usan: Items.jsx, MenuMas.jsx, guardiaSalida.js, SolicitarCitaView.jsx, CambiarPasswordView.jsx,
+//     RegistrarAsistenciaView.jsx, RegistrarReporteView.jsx, AjustesNotificacionesView.jsx (+11 más)
+//
+// Para modificar:
+//   confirmar(titulo, mensaje, { peligroso }) → true/false · avisar(titulo, mensaje) · avisarResultado.
+// <<< FIN GUÍA
 import { Alert, Platform } from 'react-native';
 
 /**

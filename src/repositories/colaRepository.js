@@ -1,3 +1,11 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: ColaRepository: operaciones que se pueden hacer SIN CONEXIÓN.
+// Lo usan: ConexionContext.jsx, academicoRepository.js, asistenciaRepository.js, conductaRepository.js,
+//     mensajesRepository.js, useChatViewModel.js, PendientesView.jsx
+//
+// Para modificar:
+//   Operaciones sin conexión. Una operación nueva offline → agrégala en ENVIOS.
+// <<< FIN GUÍA
 import PendienteDao from '../database/dao/pendienteDao';
 import AsistenciaApi from '../services/api/asistenciaApi';
 import ConductaApi from '../services/api/conductaApi';

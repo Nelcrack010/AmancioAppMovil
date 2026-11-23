@@ -1,3 +1,14 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: Selector de opciones en forma de "pastillas" desplazables (reemplaza a las pestañas y desplegables del
+//     campus web). Se usa para bimestres, secciones, pestañas de un curso...
+//   <Selector opciones, valor, alCambiar, style />
+// Lo usan: MiAsistenciaView.jsx, MisNotasView.jsx, ConductaView.jsx, RegistrarAsistenciaView.jsx,
+//     ReporteAsistenciaView.jsx, AjustesNotificacionesView.jsx, HorarioView.jsx, CursoDetalleView.jsx (+3 más)
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import Texto from './Texto';

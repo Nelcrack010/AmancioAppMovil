@@ -1,3 +1,18 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: Lista agrupada: una sola tarjeta blanca con filas separadas por una línea fina (como la pantalla de
+//     ajustes del celular). Es la forma estándar de mostrar listas en la app: cursos, mensajes, tareas,
+//     estudiantes, citas...
+//   <Lista children, style />
+//   <ItemLista icono, colorIcono = COLORES.guinda, fondoIcono = COLORES.crema, izquierda, titulo, subtitulo,
+//       detalle, derecha, onPress, resaltado = false, acento />
+//   <BotonIcono icono, onPress, color = COLORES.textoSecundario, etiqueta />
+// Lo usan: Items.jsx, MiAsistenciaView.jsx, ConductaView.jsx, ReporteAsistenciaView.jsx, CatalogoFaltasView.jsx,
+//     HorarioView.jsx, NotificacionesView.jsx, PerfilView.jsx (+14 más)
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React from 'react';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

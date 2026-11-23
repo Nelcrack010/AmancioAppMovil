@@ -1,3 +1,18 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: Componentes pequeños de presentación que se repiten en muchas pantallas.
+//   <Seccion titulo, accion, style />
+//   <Fila rotulo, valor />
+//   <Avatar nombre = '', tamano = 44, fondo = COLORES.crema, color = COLORES.guinda />
+//   <Dato valor, rotulo, color = COLORES.guinda />
+//   <FilaDatos children />
+//   <Separador />
+// Lo usan: ResumenConducta.jsx, MiAsistenciaView.jsx, MisCitasView.jsx, MisNotasView.jsx, ConductaView.jsx,
+//     RegistrarAsistenciaView.jsx, RegistrarReporteView.jsx, ReporteAsistenciaView.jsx (+20 más)
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Texto from './Texto';

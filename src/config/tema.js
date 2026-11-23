@@ -1,3 +1,11 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Tema visual de la app: colores, tipografía, espacios y bordes.
+// Lo usan: App.jsx, Archivos.jsx, AvisoPermisoNotificaciones.jsx, Basicos.jsx, Boton.jsx, Campo.jsx,
+//     DialogoTexto.jsx, Estados.jsx (+49 más)
+//
+// Para modificar:
+//   Colores (COLORES), espacios (ESPACIO), bordes (RADIO), sombras y tipografía de toda la app.
+// <<< FIN GUÍA
 /**
  * Tema visual de la app: colores, tipografía, espacios y bordes.
  *

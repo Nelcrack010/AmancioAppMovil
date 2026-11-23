@@ -1,3 +1,10 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: ConexionContext: detecta si hay internet y lleva la cuenta de las operaciones pendientes.
+// Lo usan: App.jsx, BannerConexion.jsx, MenuMas.jsx, PendientesView.jsx, PerfilView.jsx
+//
+// Para modificar:
+//   Si hay internet o no (banner sin conexión) y la sincronización de la cola.
+// <<< FIN GUÍA
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo';
 import ColaRepository, { suscribirCambiosCola } from '../repositories/colaRepository';

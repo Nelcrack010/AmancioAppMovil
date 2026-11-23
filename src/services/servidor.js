@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Dirección del SERVIDOR (backend Flask) que usa la app.
+// Lo usan: ConexionContext.jsx, SesionContext.jsx, apiClient.js, LoginView.jsx
+// <<< FIN GUÍA
 import { API_CONFIG, STORAGE_KEYS } from '../config/constants';
 import Almacenamiento from './almacenamiento';
 

@@ -1,3 +1,31 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Académico (año y secciones), Notas   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: MisNotasView (estudiante): notas por bimestre (cada evaluación y el promedio del curso) y la libreta,
+//     que solo muestra los bimestres ya cerrados.
+// Pantalla «MisNotas» (src/navigation/pantallas.js): en el menú de ALUMNO («Notas») (src/config/menus.js)
+//   Se abre desde: InicioAlumno.jsx  con navigation.navigate('MisNotas', {...})
+//
+// Datos (repositorio → endpoint → backend):
+//   AcademicoRepository.anioActivo() → GET /academico/anio-activo (backend: academico_routes.py → anio_activo())
+//   AcademicoRepository.miLibreta() → GET /notas/mi-libreta (backend: nota_routes.py → mi_libreta())
+//   AcademicoRepository.misNotas() → GET /notas/mis-notas (backend: nota_routes.py → mis_notas())
+// Botones / secciones: «Libreta vacía», «Sin cursos»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
@@ -24,6 +52,9 @@ const OPCIONES = [
  * curso) y la libreta, que solo muestra los bimestres ya cerrados.
  */
 export default function MisNotasView() {
+  // PISTA: «anio» = datos que se cargan al abrir la pantalla: AcademicoRepository.anioActivo() → GET
+  //     /academico/anio-activo (backend: academico_routes.py → anio_activo()). Úsalos con anio.datos;
+  //     anio.recargar() vuelve a pedirlos.
   const anio = useConsulta(() => AcademicoRepository.anioActivo(), []);
   const [vista, setVista] = useState(null);
 
@@ -38,6 +69,8 @@ export default function MisNotasView() {
 
   if (vista === null) return <Cargando />;
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <View style={estilos.fondo}>
       <View style={estilos.barra}>
@@ -50,8 +83,13 @@ export default function MisNotasView() {
 
 /** Cursos del bimestre con sus evaluaciones y el promedio. */
 function NotasDelBimestre({ bimestre }) {
+  // PISTA: «notas» = datos que se cargan al abrir la pantalla: AcademicoRepository.misNotas() → GET
+  //     /notas/mis-notas (backend: nota_routes.py → mis_notas()). Úsalos con notas.datos; notas.recargar()
+  //     vuelve a pedirlos.
   const notas = useConsulta(() => AcademicoRepository.misNotas(bimestre), [bimestre]);
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla consulta={notas}>
       {(datos) => (datos.cursos.length === 0 ? (
@@ -76,8 +114,13 @@ function NotasDelBimestre({ bimestre }) {
 
 /** Libreta: consolidado por curso de los bimestres cerrados. */
 function Libreta() {
+  // PISTA: «libreta» = datos que se cargan al abrir la pantalla: AcademicoRepository.miLibreta() → GET
+  //     /notas/mi-libreta (backend: nota_routes.py → mi_libreta()). Úsalos con libreta.datos; libreta.recargar()
+  //     vuelve a pedirlos.
   const libreta = useConsulta(() => AcademicoRepository.miLibreta(), []);
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla consulta={libreta}>
       {(datos) => (datos.cursos.length === 0 ? (
@@ -114,6 +157,7 @@ function Libreta() {
   );
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   fondo: { flex: 1, backgroundColor: COLORES.fondo },
   barra: {

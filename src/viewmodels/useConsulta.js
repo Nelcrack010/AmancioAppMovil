@@ -1,3 +1,16 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: general   ·   Capa: VIEWMODEL · lógica de una pantalla (estado, cargar, guardar) separada del dibujo
+// Qué es: useConsulta: ViewModel genérico para las pantallas que MUESTRAN datos.
+// Lo usan: useNotasCursoViewModel.js, useRegistroAsistenciaViewModel.js, MiAsistenciaView.jsx,
+//     MiConductaView.jsx, MisCitasView.jsx, MisNotasView.jsx, ConductaAlumnoView.jsx, ConductaView.jsx (+20 más)
+//
+// Datos (repositorio → endpoint → backend):
+//   CacheRepository.actualizar() → solo en el celular
+//   CacheRepository.leerLocal() → solo en el celular
+//
+// Para modificar: casi nunca se toca. En la pantalla: const x = useConsulta(() => Repo.metodo(a), [a]);
+//   el arreglo [a] hace que se vuelva a cargar cuando cambia «a» (por ejemplo un filtro).
+// <<< FIN GUÍA
 import { useCallback, useRef, useState } from 'react';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import CacheRepository from '../repositories/cacheRepository';

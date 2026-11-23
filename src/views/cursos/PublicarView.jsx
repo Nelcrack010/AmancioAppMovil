@@ -1,3 +1,42 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Académico (año y secciones), Aula virtual · Clases virtuales, Aula virtual · Materiales, Aula virtual
+//     · Tareas   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: PublicarView (docente): un solo formulario para publicar o editar - una tarea          (tipo 'tarea':
+//     título, descripción, fecha de entrega, bimestre, enunciado) - un material        (tipo 'material': título,
+//     descripción, enlace, bimestre) - una clase virtual  (tipo 'clase':    tema, fecha y hora, enlace)
+// Pantalla «Publicar» (src/navigation/pantallas.js): pantalla de detalle, título «Publicar»
+//   Se abre desde: PestanaClases.jsx, PestanaMateriales.jsx, PestanaTareas.jsx  con
+//       navigation.navigate('Publicar', {...})
+// Desde aquí se va a: Menu
+//
+// Datos (repositorio → endpoint → backend):
+//   AcademicoRepository.anioActivo() → GET /academico/anio-activo (backend: academico_routes.py → anio_activo())
+//   AcademicoRepository.crearClase() → POST /clases/<int:id_carga> (backend: clase_routes.py → crear())
+//   AcademicoRepository.editarClase() → PUT /clases/item/<int:id_clase> (backend: clase_routes.py → editar())
+//   AcademicoRepository.editarMaterial() → PUT /material/item/<int:id_material> (backend: material_routes.py →
+//       editar())
+//   AcademicoRepository.publicarMaterial() → POST /material/<int:id_carga> (backend: material_routes.py →
+//       publicar())
+//   AcademicoRepository.publicarTarea() → POST /tareas/<int:id_carga> (backend: tarea_routes.py → publicar())
+// Campos: «Archivo del enunciado (opcional)», «Descripción (opcional)», «Hora»
+// Validación local (antes de enviar): el tema minimo: 0, maximo: 150; el título minimo: 3, maximo: 150; la
+//     descripción minimo: 0, maximo: 2000; el enlace requerido: tipo === 'clase'
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
@@ -31,7 +70,12 @@ const BIMESTRES = [1, 2, 3, 4].map((n) => ({ valor: n, texto: `${n}° bimestre` 
 export default function PublicarView({ navigation, route }) {
   const { tipo, idCarga, item } = route.params;
   const editando = Boolean(item);
+  // PISTA: acción de guardar/enviar: accion.ejecutar(() => Repo.metodo(...)) devuelve { ok, resultado };
+  //     accion.enviando = cargando; accion.error = mensaje de la API.
   const accion = useAccion();
+  // PISTA: «anio» = datos que se cargan al abrir la pantalla: AcademicoRepository.anioActivo() → GET
+  //     /academico/anio-activo (backend: academico_routes.py → anio_activo()). Úsalos con anio.datos;
+  //     anio.recargar() vuelve a pedirlos.
   const anio = useConsulta(() => AcademicoRepository.anioActivo(), []);
 
   // Valores iniciales: los del elemento que se edita o valores por defecto.
@@ -53,6 +97,7 @@ export default function PublicarView({ navigation, route }) {
   const usaFecha = tipo !== 'material';
   const usaBimestre = tipo !== 'clase';
 
+  // PISTA: guardar() se ejecuta al tocar el botón «}           icono={editando ? ».
   const guardar = async () => {
     const error = primerError(
       tipo === 'clase'
@@ -99,6 +144,8 @@ export default function PublicarView({ navigation, route }) {
       : AcademicoRepository.crearClase(idCarga, datos);
   };
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla>
       <Tarjeta>
@@ -159,6 +206,7 @@ export default function PublicarView({ navigation, route }) {
   );
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   fila: { flexDirection: 'row', gap: ESPACIO.sm },
   flex: { flex: 1 },

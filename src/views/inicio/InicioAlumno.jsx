@@ -1,3 +1,27 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: general   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: Panel del estudiante: resumen del año (conducta, asistencia), próximas tareas, clases de hoy, cita de
+//     psicología, últimas notas y próximas clases virtuales.
+// Se muestra dentro de: InicioView.jsx
+// Desde aquí se va a: CursoDetalle, MisCitas, MisNotas
+// Botones / secciones: «Clases de hoy», «Próximas clases virtuales», «Próximas tareas», «Tu cita de psicología»,
+//     «Últimas notas»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React from 'react';
 import Texto from '../../components/Texto';
 import Etiqueta from '../../components/Etiqueta';
@@ -21,6 +45,8 @@ export default function InicioAlumno({ datos, navigation }) {
   const cita = datos.cita_activa;
   const estadoCita = cita && infoEstado(ESTADOS_CITA, cita.estado);
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <>
       <FilaDatos>

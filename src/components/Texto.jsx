@@ -1,3 +1,13 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: Texto: reemplaza a <Text> en toda la app para usar siempre la fuente Lato y los tamaños del tema.
+//   <Texto variante = 'normal', color, negrita = false, centrado = false, style, children, ...resto />
+// Lo usan: Archivos.jsx, Basicos.jsx, Boton.jsx, Campo.jsx, DialogoTexto.jsx, Estados.jsx, Etiqueta.jsx,
+//     Items.jsx (+38 más)
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { COLORES, FUENTES, TAMANOS } from '../config/tema';

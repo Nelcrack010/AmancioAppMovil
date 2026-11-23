@@ -1,3 +1,38 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Citas de psicología   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: CitaDetalleView (psicólogo): gestiona una cita. - PENDIENTE o PROGRAMADA: programar / reprogramar
+//     (fecha y hora futuras) o cancelar. - PROGRAMADA: marcar como atendida con la observación (reservada). El
+//     estudiante recibe un aviso cuando su cita se programa, reprograma o cancela.
+// Pantalla «CitaDetalle» (src/navigation/pantallas.js): pantalla de detalle, título «Cita»
+//   Se abre desde: InicioPsicologo.jsx, AgendaView.jsx  con navigation.navigate('CitaDetalle', {...})
+// Desde aquí se va a: ConductaAlumno, HistorialAlumno, Menu
+//
+// Datos (repositorio → endpoint → backend):
+//   ConductaRepository.cancelarCita() → PATCH /citas/<int:id_cita>/cancelar (backend: cita_routes.py →
+//       cancelar())
+//   ConductaRepository.completarCita() → PATCH /citas/<int:id_cita>/completar (backend: cita_routes.py →
+//       completar())
+//   ConductaRepository.programarCita() → PATCH /citas/<int:id_cita>/programar (backend: cita_routes.py →
+//       programar())
+// Botones / secciones: «Cancelar cita», «Estado de conducta», «Historial de citas», «Marcar como atendida»,
+//     «Registrar atención»
+// Campos: «Fecha», «Hora», «Motivo de la cancelación», «Observación»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
@@ -27,6 +62,8 @@ import { ESPACIO } from '../../config/tema';
  */
 export default function CitaDetalleView({ navigation, route }) {
   const { cita } = route.params;
+  // PISTA: acción de guardar/enviar: accion.ejecutar(() => Repo.metodo(...)) devuelve { ok, resultado };
+  //     accion.enviando = cargando; accion.error = mensaje de la API.
   const accion = useAccion();
   const [fecha, setFecha] = useState(cita.fecha_cita ? cita.fecha_cita.slice(0, 10) : sumarDias(hoyISO(), 1));
   const [hora, setHora] = useState(cita.fecha_cita ? cita.fecha_cita.slice(11, 16) : '10:00');
@@ -46,6 +83,7 @@ export default function CitaDetalleView({ navigation, route }) {
     }
   };
 
+  // PISTA: programar() se ejecuta al tocar el botón «Programar cita».
   const programar = async () => {
     const error = !esFechaValida(fecha) ? 'La fecha debe tener el formato AAAA-MM-DD.'
       : !esHoraValida(hora) ? 'La hora debe tener el formato HH:MM (24 horas).' : null;
@@ -67,6 +105,8 @@ export default function CitaDetalleView({ navigation, route }) {
     }
   };
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <>
       <Pantalla>
@@ -141,6 +181,7 @@ export default function CitaDetalleView({ navigation, route }) {
   );
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   botones: { gap: ESPACIO.sm, marginBottom: ESPACIO.md },
   fila: { flexDirection: 'row', gap: ESPACIO.sm },

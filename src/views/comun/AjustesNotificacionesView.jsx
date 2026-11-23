@@ -1,3 +1,35 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Notificaciones (avisos)   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: AjustesNotificacionesView: silenciar o limitar las notificaciones PUSH (las que llegan al celular).
+//     Los avisos siempre quedan guardados en "Avisos"; esto solo decide cuáles suenan en el celular.
+// Pantalla «AjustesNotificaciones» (src/navigation/pantallas.js): pantalla de detalle, título «Notificaciones»
+//   Se abre desde: NotificacionesView.jsx, PerfilView.jsx  con navigation.navigate('AjustesNotificaciones',
+//       {...})
+//
+// Datos (repositorio → endpoint → backend):
+//   MensajesRepository.guardarPreferencias() → PUT /notificaciones/preferencias (backend: notificacion_routes.py
+//       → guardar_preferencias())
+//   MensajesRepository.preferencias() → GET /notificaciones/preferencias (backend: notificacion_routes.py →
+//       preferencias())
+// Botones / secciones: «Guardar», «Horario «no molestar»», «Pausar por un tiempo», «Quitar la pausa», «Qué
+//     notificaciones recibir», «Silenciar todas las notificaciones», «Todos los días»
+// Campos: «Desde», «Hasta»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Switch, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -33,7 +65,12 @@ import { COLORES, ESPACIO } from '../../config/tema';
  * (TIPOS en app/services/notificacion_service.py). El ícono sale de src/config/notificaciones.js.
  */
 export default function AjustesNotificacionesView() {
+  // PISTA: «consulta» = datos que se cargan al abrir la pantalla: MensajesRepository.preferencias() → GET
+  //     /notificaciones/preferencias (backend: notificacion_routes.py → preferencias()). Úsalos con
+  //     consulta.datos; consulta.recargar() vuelve a pedirlos.
   const consulta = useConsulta(() => MensajesRepository.preferencias(), []);
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla consulta={consulta}>
       {(datos) => <Formulario datos={datos} alGuardar={consulta.recargar} />}
@@ -42,6 +79,8 @@ export default function AjustesNotificacionesView() {
 }
 
 function Formulario({ datos, alGuardar }) {
+  // PISTA: acción de guardar/enviar: accion.ejecutar(() => Repo.metodo(...)) devuelve { ok, resultado };
+  //     accion.enviando = cargando; accion.error = mensaje de la API.
   const accion = useAccion();
   const [silenciarTodo, setSilenciarTodo] = useState(datos.silenciar_todo);
   const [activos, setActivos] = useState(() => Object.fromEntries(datos.tipos.map((t) => [t.tipo, t.activo])));
@@ -57,6 +96,7 @@ function Formulario({ datos, alGuardar }) {
   }, [datos]);
 
   /** Guarda en el servidor. `extra` sirve para la pausa (pausar_horas). */
+  // PISTA: guardar() se ejecuta al tocar el botón «Quitar la pausa, Guardar».
   const guardar = async (extra = {}) => {
     if (usaNoMolestar && (!esHoraValida(desde) || !esHoraValida(hasta))) {
       setErrorLocal('Las horas deben tener el formato HH:MM (24 horas), por ejemplo 22:00.');
@@ -83,6 +123,8 @@ function Formulario({ datos, alGuardar }) {
   const pausado = Boolean(datos.pausado_hasta);
   const opcionesPausa = datos.opciones_pausa_horas.map((h) => ({ valor: h, texto: h === 1 ? '1 hora' : `${h} horas` }));
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <>
       <AvisoPermisoNotificaciones />
@@ -159,6 +201,8 @@ function Formulario({ datos, alGuardar }) {
 
 /** Fila con título, descripción y un interruptor (Switch) a la derecha. */
 function Interruptor({ icono, titulo, descripcion, valor, alCambiar, deshabilitado = false }) {
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <View style={[estilos.fila, deshabilitado && estilos.apagado]}>
       {icono && <Ionicons name={`${icono}-outline`} size={20} color={COLORES.guinda} />}
@@ -178,6 +222,7 @@ function Interruptor({ icono, titulo, descripcion, valor, alCambiar, deshabilita
   );
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   fila: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.md, paddingVertical: ESPACIO.xs },
   flex: { flex: 1, gap: 2 },

@@ -1,3 +1,11 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Registro de TODAS las pantallas de la app.
+// Lo usan: AppNavigator.jsx, MenuNavigator.jsx
+//
+// Para modificar:
+//   Pantalla nueva: impórtala y agrégala en PANTALLAS_MENU (si va en el menú, más menus.js)
+//   o en PANTALLAS_DETALLE { componente, titulo } si se abre con navigation.navigate('Nombre').
+// <<< FIN GUÍA
 /**
  * Registro de TODAS las pantallas de la app.
  *

@@ -1,3 +1,14 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: ResumenConducta: nota de conducta del bimestre actual, la nota de cada bimestre y los reportes. Lo
+//     usan la pantalla del estudiante (MiConducta) y la del personal (ConductaAlumno), que además puede anular
+//     reportes (`alAnular`).
+//   <ResumenConducta datos, alAnular />
+// Lo usan: MiConductaView.jsx, ConductaAlumnoView.jsx
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Tarjeta from './Tarjeta';

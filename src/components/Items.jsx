@@ -1,3 +1,16 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: Elementos que se repiten en varias pantallas. Están pensados para ir dentro de <Lista>.
+//   <BloqueHorario bloque, actual = false />
+//   <BloqueReceso receso />
+//   <FilaClaseVirtual clase, acciones />
+//   <BotonEnlace texto, icono = 'open-outline', url />
+// Lo usan: Archivos.jsx, ResumenConducta.jsx, HorarioView.jsx, CalificarEntregaView.jsx, EntregasView.jsx,
+//     TareaDetalleView.jsx, PestanaClases.jsx, PestanaMateriales.jsx (+2 más)
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

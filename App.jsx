@@ -1,3 +1,9 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Punto de entrada de Campus AV Móvil.
+//
+// Para modificar:
+//   Punto de entrada: fuentes, sesión, conexión y navegación. Casi nunca se toca.
+// <<< FIN GUÍA
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';

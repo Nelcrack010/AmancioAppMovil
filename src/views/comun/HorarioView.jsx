@@ -1,3 +1,30 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Horario   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: HorarioView: horario del estudiante (según su sección) o del docente (según su carga). Vista por día
+//     con el bloque actual destacado, o vista de toda la semana. Se guarda en el celular, así que también se ve
+//     sin conexión.
+// Pantalla «Horario» (src/navigation/pantallas.js): en el menú de ALUMNO («Horario»), DOCENTE («Horario»)
+//     (src/config/menus.js)
+//
+// Datos (repositorio → endpoint → backend):
+//   AcademicoRepository.horario() → GET /horario/mi-horario (backend: horario_routes.py → mi_horario())
+// Botones / secciones: «Sin horario»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
@@ -18,10 +45,15 @@ const SEMANA = 'SEMANA';
  * Se guarda en el celular, así que también se ve sin conexión.
  */
 export default function HorarioView() {
+  // PISTA: «horario» = datos que se cargan al abrir la pantalla: AcademicoRepository.horario() → GET
+  //     /horario/mi-horario (backend: horario_routes.py → mi_horario()). Úsalos con horario.datos;
+  //     horario.recargar() vuelve a pedirlos.
   const horario = useConsulta(() => AcademicoRepository.horario(), []);
   const hoy = nombreDia(hoyISO());
   const [diaElegido, setDiaElegido] = useState(null);
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla consulta={horario}>
       {(datos) => {

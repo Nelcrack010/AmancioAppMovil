@@ -1,3 +1,11 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Textos y colores de los estados que devuelve la API.
+// Lo usan: ResumenConducta.jsx, MenuMas.jsx, useRegistroAsistenciaViewModel.js, MiAsistenciaView.jsx,
+//     MisCitasView.jsx, MisNotasView.jsx, RegistrarAsistenciaView.jsx, RegistrarReporteView.jsx (+14 más)
+//
+// Para modificar:
+//   Textos y colores de cada estado (PENDIENTE, ATENDIDA...). Estado nuevo → agrégalo aquí.
+// <<< FIN GUÍA
 import { COLORES } from './tema';
 
 /**

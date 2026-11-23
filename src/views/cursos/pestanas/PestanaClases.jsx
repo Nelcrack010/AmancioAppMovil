@@ -1,3 +1,32 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Aula virtual · Clases virtuales   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: Pestaña "Clases virtuales": enlaces de las clases (Meet, Zoom...). Al tocar una se abre. El docente
+//     además puede programar, editar y eliminar clases.
+// Se muestra dentro de: CursoDetalleView.jsx
+// Desde aquí se va a: Publicar
+//
+// Datos (repositorio → endpoint → backend):
+//   AcademicoRepository.clases() → GET /clases/<int:id_carga> (backend: clase_routes.py → listar())
+//   AcademicoRepository.eliminarClase() → DELETE /clases/item/<int:id_clase> (backend: clase_routes.py →
+//       eliminar())
+// Botones / secciones: «Programar clase», «Sin clases virtuales»
+// Campos: «Editar clase», «Eliminar clase»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../../components/Pantalla';
@@ -15,6 +44,9 @@ import { COLORES } from '../../../config/tema';
  * El docente además puede programar, editar y eliminar clases.
  */
 export default function PestanaClases({ idCarga, esDocente, navigation }) {
+  // PISTA: «clases» = datos que se cargan al abrir la pantalla: AcademicoRepository.clases() → GET
+  //     /clases/<int:id_carga> (backend: clase_routes.py → listar()). Úsalos con clases.datos; clases.recargar()
+  //     vuelve a pedirlos.
   const clases = useConsulta(() => AcademicoRepository.clases(idCarga), [idCarga]);
 
   const eliminar = async (c) => {
@@ -27,6 +59,8 @@ export default function PestanaClases({ idCarga, esDocente, navigation }) {
     }
   };
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla
       consulta={clases}
@@ -58,6 +92,7 @@ export default function PestanaClases({ idCarga, esDocente, navigation }) {
   );
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   acciones: { flexDirection: 'row' },
 });

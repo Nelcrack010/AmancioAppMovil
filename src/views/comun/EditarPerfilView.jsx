@@ -1,3 +1,38 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Perfil   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: EditarPerfilView: edición de los datos permitidos. - Todos: teléfono y correo de contacto (en el
+//     estudiante, los de su familiar). - Estudiante: además, dirección y datos médicos.
+// Pantalla «EditarPerfil» (src/navigation/pantallas.js): pantalla de detalle, título «Editar mis datos»
+//   Se abre desde: PerfilView.jsx  con navigation.navigate('EditarPerfil', {...})
+// Desde aquí se va a: Menu
+//
+// Datos (repositorio → endpoint → backend):
+//   PerfilRepository.actualizarContacto() → PATCH /perfil/contacto/<username> (backend: perfil_routes.py →
+//       actualizar_contacto())
+//   PerfilRepository.actualizarDireccion() → PATCH /perfil/alumno/<username>/direccion (backend:
+//       perfil_routes.py → actualizar_direccion())
+//   PerfilRepository.actualizarMedicos() → PATCH /perfil/alumno/<username>/medicos (backend: perfil_routes.py →
+//       actualizar_medicos())
+// Botones / secciones: «Contacto», «Estudiante», «Guardar cambios»
+// Campos: «Correo», «Datos médicos», «Dirección», «Teléfono»
+// Validación local (antes de enviar): la dirección minimo: 3, maximo: 300; los datos médicos minimo: 0, maximo:
+//     150
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useState } from 'react';
 import Pantalla from '../../components/Pantalla';
 import Tarjeta from '../../components/Tarjeta';
@@ -21,6 +56,8 @@ export default function EditarPerfilView({ navigation, route }) {
   const { usuario } = useSesion();
   const perfil = route.params?.perfil || {};
   const esAlumno = usuario.rol === 'ALUMNO';
+  // PISTA: acción de guardar/enviar: accion.ejecutar(() => Repo.metodo(...)) devuelve { ok, resultado };
+  //     accion.enviando = cargando; accion.error = mensaje de la API.
   const accion = useAccion();
 
   const [telefono, setTelefono] = useState(perfil.telefono || '');
@@ -29,6 +66,7 @@ export default function EditarPerfilView({ navigation, route }) {
   const [enfermedad, setEnfermedad] = useState(perfil.enfermedad || '');
   const [errorLocal, setErrorLocal] = useState(null);
 
+  // PISTA: guardar() se ejecuta al tocar el botón «Guardar cambios».
   const guardar = async () => {
     const error = primerError(
       telefono && !/^\d{9}$/.test(telefono) ? 'El teléfono debe tener 9 dígitos.' : null,
@@ -56,6 +94,8 @@ export default function EditarPerfilView({ navigation, route }) {
     }
   };
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla>
       {(errorLocal || accion.error) && <Aviso tono="error">{errorLocal || accion.error}</Aviso>}

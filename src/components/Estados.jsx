@@ -1,3 +1,18 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: Estados de interfaz que pide la propuesta: Cargando, Vacío, Error y Sin conexión. Todas las pantallas
+//     usan estos mismos componentes para verse consistentes.
+//   <Cargando mensaje = 'Cargando...' />
+//   <Vacio icono = 'file-tray-outline', titulo = 'No hay nada por aquí', mensaje />
+//   <ErrorVista error, onReintentar />
+//   <Aviso tono = 'info', icono, children />
+//   <AvisoDatosGuardados aviso, actualizadoEn />
+// Lo usan: App.jsx, AvisoPermisoNotificaciones.jsx, DialogoTexto.jsx, Pantalla.jsx, AppNavigator.jsx,
+//     MiAsistenciaView.jsx, MisCitasView.jsx, MisNotasView.jsx (+31 más)
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';

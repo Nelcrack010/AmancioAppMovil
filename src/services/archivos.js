@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Elegir, revisar y abrir archivos (PDF, Word, Excel, PowerPoint, imágenes...).
+// Lo usan: Archivos.jsx, EntregasView.jsx
+// <<< FIN GUÍA
 import * as DocumentPicker from 'expo-document-picker';
 import { API_CONFIG } from '../config/constants';
 import { MAX_MB_ARCHIVO, TIPOS_DE_ARCHIVO } from '../config/archivos';

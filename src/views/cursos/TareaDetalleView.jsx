@@ -1,3 +1,33 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Aula virtual · Tareas   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: Contenido principal de la tarea una vez que sus datos están cargados.
+// Pantalla «TareaDetalle» (src/navigation/pantallas.js): pantalla de detalle, título «Tarea»
+//   Se abre desde: PestanaTareas.jsx  con navigation.navigate('TareaDetalle', {...})
+// Desde aquí se va a: Menu
+//
+// Datos (repositorio → endpoint → backend):
+//   AcademicoRepository.entregarTarea() → POST /tareas/item/<int:id_tarea>/entregar (backend: tarea_routes.py →
+//       entregar()) · sin conexión: queda en cola
+//   AcademicoRepository.tarea() → GET /tareas/item/<int:id_tarea> (backend: tarea_routes.py → obtener())
+// Botones / secciones: «Mi entrega»
+// Campos: «Comentario (opcional)», «O pega un enlace (opcional si subiste un archivo)», «Sube tu trabajo»
+// Validación local (antes de enviar): el enlace de tu trabajo; el comentario minimo: 0, maximo: 1000
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useLayoutEffect, useState } from 'react';
 import Pantalla from '../../components/Pantalla';
 import Tarjeta from '../../components/Tarjeta';
@@ -22,6 +52,8 @@ import { COLORES } from '../../config/tema';
  * Contenido principal de la tarea una vez que sus datos están cargados.
  */
 function ContenidoTareaDetalle({ tarea, navigation }) {
+  // PISTA: acción de guardar/enviar: accion.ejecutar(() => Repo.metodo(...)) devuelve { ok, resultado };
+  //     accion.enviando = cargando; accion.error = mensaje de la API.
   const accion = useAccion();
   const [archivo, setArchivo] = useState(null);       // archivo elegido para subir
   const [enlace, setEnlace] = useState(tarea.archivo_url || '');
@@ -39,6 +71,7 @@ function ContenidoTareaDetalle({ tarea, navigation }) {
   const yaEntrego = Boolean(tarea.id_entrega);
 
   // Se entrega con un ARCHIVO y/o un ENLACE (al menos uno de los dos).
+  // PISTA: entregar() se ejecuta al tocar el botón «Entregar».
   const entregar = async () => {
     const error = primerError(
       !archivo && !enlace.trim() ? 'Sube un archivo o pega el enlace de tu trabajo.' : null,
@@ -64,6 +97,8 @@ function ContenidoTareaDetalle({ tarea, navigation }) {
     }
   };
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla>
       <Tarjeta>
@@ -135,6 +170,7 @@ export default function TareaDetalleView({ navigation, route }) {
   const tareaParam = route.params?.tarea;
   const idTarea = route.params?.idTarea || route.params?.id || tareaParam?.id_tarea;
 
+  // PISTA: datos que se cargan al abrir la pantalla (useConsulta): .datos, .cargando, .error, .recargar().
   const consulta = useConsulta(
     () => (!tareaParam && idTarea ? AcademicoRepository.tarea(idTarea) : null),
     [idTarea, tareaParam]

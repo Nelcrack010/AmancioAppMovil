@@ -1,3 +1,12 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Opciones del menú (barra inferior) de cada rol.
+// Lo usan: MenuBar.jsx, MenuNavigator.jsx, abrirNotificacion.js
+//
+// Para modificar:
+//   Agregar/quitar/reordenar opciones del menú de un rol: edita la lista del rol en MENU_POR_ROL.
+//     { pantalla: 'NombreEnPantallas', titulo: 'Texto', icono: 'nombre-ionicons' }
+//   Las primeras MAXIMO_EN_BARRA van en la barra; el resto en «Más».
+// <<< FIN GUÍA
 /**
  * Opciones del menú (barra inferior) de cada rol.
  *

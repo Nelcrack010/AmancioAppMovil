@@ -1,3 +1,12 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Validaciones locales de formularios.
+// Lo usan: DialogoTexto.jsx, useNotasCursoViewModel.js, SolicitarCitaView.jsx, CambiarPasswordView.jsx,
+//     LoginView.jsx, RegistrarReporteView.jsx, EditarPerfilView.jsx, CalificarEntregaView.jsx (+2 más)
+//
+// Para modificar:
+//   validarTexto(valor, 'nombre', { minimo, maximo }), validarEnlace, primerError(...):
+//   devuelven el mensaje de error o null. Regla nueva reutilizable → agrégala aquí.
+// <<< FIN GUÍA
 /**
  * Validaciones locales de formularios.
  *

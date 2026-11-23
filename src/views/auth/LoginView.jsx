@@ -1,3 +1,27 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: general   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: LoginView: inicio de sesión con usuario y contraseña. Arriba, el bloque guinda con el logo (como la
+//     portada del login del campus web); abajo, la tarjeta blanca con el formulario.
+// Se muestra dentro de: AppNavigator.jsx
+// Botones / secciones: «Ingresar», «Servidor»
+// Campos: «Contraseña», «Dirección del servidor», «Usuario»
+// Validación local (antes de enviar): tu usuario minimo: 3, maximo: 50; tu contraseña minimo: 1, maximo: 200
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useEffect, useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,6 +50,8 @@ import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
  */
 export default function LoginView() {
   const { iniciarSesion, sesionVencida } = useSesion();
+  // PISTA: acción de guardar/enviar: accion.ejecutar(() => Repo.metodo(...)) devuelve { ok, resultado };
+  //     accion.enviando = cargando; accion.error = mensaje de la API.
   const accion = useAccion();
   const [usuario, setUsuario] = useState('');
   const [clave, setClave] = useState('');
@@ -39,6 +65,7 @@ export default function LoginView() {
     esperarServidor().then(() => setServidor(servidorActual()));
   }, []);
 
+  // PISTA: entrar() se ejecuta al tocar el botón «Ingresar».
   const entrar = async () => {
     // 1. Validación local, antes de llamar a la API.
     const error = primerError(
@@ -69,6 +96,8 @@ export default function LoginView() {
 
   const mensajeError = errorLocal || accion.error;
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <SafeAreaView style={estilos.fondo} edges={['top']}>
       <KeyboardAvoidingView style={estilos.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -160,6 +189,7 @@ export default function LoginView() {
   );
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   fondo: { flex: 1, backgroundColor: COLORES.guinda },
   flex: { flex: 1 },

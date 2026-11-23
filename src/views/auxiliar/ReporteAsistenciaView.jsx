@@ -1,3 +1,33 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Académico (año y secciones), Asistencia   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: Rangos rápidos de fechas: [desde, hasta].
+// Pantalla «ReporteAsistencia» (src/navigation/pantallas.js): en el menú de AUXILIAR («Reporte de asistencia»),
+//     ADMIN («Asistencia») (src/config/menus.js)
+//   Se abre desde: InicioAdmin.jsx, InicioAuxiliar.jsx  con navigation.navigate('ReporteAsistencia', {...})
+// Desde aquí se va a: ConductaAlumno
+//
+// Datos (repositorio → endpoint → backend):
+//   AcademicoRepository.secciones() → GET /academico/secciones (backend: academico_routes.py → secciones())
+//   AsistenciaRepository.resumen() → GET /asistencia/seccion/<int:id_seccion>/resumen (backend:
+//       asistencia_routes.py → resumen_de_seccion())
+// Botones / secciones: «Sección sin estudiantes»
+// Campos: «Desde», «Hasta»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
@@ -26,6 +56,9 @@ const RANGOS = {
  * porcentaje. Al tocar un estudiante se ve su conducta.
  */
 export default function ReporteAsistenciaView({ navigation }) {
+  // PISTA: «secciones» = datos que se cargan al abrir la pantalla: AcademicoRepository.secciones() → GET
+  //     /academico/secciones (backend: academico_routes.py → secciones()). Úsalos con secciones.datos;
+  //     secciones.recargar() vuelve a pedirlos.
   const secciones = useConsulta(() => AcademicoRepository.secciones(), []);
   const [idSeccion, setIdSeccion] = useState(null);
   const [rango, setRango] = useState('mes');
@@ -37,6 +70,7 @@ export default function ReporteAsistenciaView({ navigation }) {
   }, [secciones.datos, idSeccion]);
 
   const fechasValidas = esFechaValida(desde) && esFechaValida(hasta) && desde <= hasta;
+  // PISTA: datos que se cargan al abrir la pantalla (useConsulta): .datos, .cargando, .error, .recargar().
   const reporte = useConsulta(
     () => (idSeccion && fechasValidas ? AsistenciaRepository.resumen(idSeccion, desde, hasta) : null),
     [idSeccion, desde, hasta, fechasValidas],
@@ -54,6 +88,8 @@ export default function ReporteAsistenciaView({ navigation }) {
   if (secciones.cargando) return <Cargando />;
   if (secciones.error) return <ErrorVista error={secciones.error} onReintentar={secciones.recargar} />;
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla>
       <Selector
@@ -110,6 +146,7 @@ export default function ReporteAsistenciaView({ navigation }) {
   );
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   fila: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.sm },
   flex: { flex: 1 },

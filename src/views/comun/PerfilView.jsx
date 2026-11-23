@@ -1,3 +1,33 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Perfil   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: PerfilView: datos del usuario, familiar (estudiante), estado de matrícula (estudiante) y acciones de
+//     la cuenta: editar datos, cambiar contraseña y cerrar sesión.
+// Pantalla «Perfil» (src/navigation/pantallas.js): en el menú de ALUMNO («Mi perfil»), DOCENTE («Mi perfil»),
+//     AUXILIAR («Mi perfil»), PSICOLOGO («Mi perfil»), ADMIN («Mi perfil») (src/config/menus.js)
+// Desde aquí se va a: AjustesNotificaciones, CambiarPassword, EditarPerfil, Pendientes
+//
+// Datos (repositorio → endpoint → backend):
+//   PerfilRepository.miMatricula() → GET /perfil/mi-matricula (backend: perfil_routes.py → mi_matricula())
+//   PerfilRepository.miPerfil() → GET /perfil/mi-perfil/<username> (backend: perfil_routes.py → mi_perfil())
+// Botones / secciones: «Cambiar contraseña», «Cerrar sesión», «Cuenta», «Editar mis datos», «Familiar /
+//     apoderado», «Mis datos», «Notificaciones», «Operaciones pendientes», «Silenciar o elegir qué avisos
+//     recibir»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
@@ -22,8 +52,12 @@ import { COLORES, ESPACIO } from '../../config/tema';
 export default function PerfilView({ navigation }) {
   const { usuario, cerrarSesion } = useSesion();
   const { pendientes } = useConexion();
+  // PISTA: «perfil» = datos que se cargan al abrir la pantalla: PerfilRepository.miPerfil() → GET
+  //     /perfil/mi-perfil/<username> (backend: perfil_routes.py → mi_perfil()). Úsalos con perfil.datos;
+  //     perfil.recargar() vuelve a pedirlos.
   const perfil = useConsulta(() => PerfilRepository.miPerfil(usuario.username), [usuario.username]);
 
+  // PISTA: salir() se ejecuta al tocar el botón «Cerrar sesión».
   const salir = async () => {
     const mensaje = pendientes > 0
       ? `Tienes ${pendientes} operación(es) sin enviar. Si cierras sesión se perderán.`
@@ -33,6 +67,8 @@ export default function PerfilView({ navigation }) {
     }
   };
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla consulta={perfil}>
       {({ datos, familiar }) => {
@@ -107,9 +143,14 @@ export default function PerfilView({ navigation }) {
 
 /** Estado de la matrícula del año (solo estudiante, sin información económica). */
 function Matricula() {
+  // PISTA: «matricula» = datos que se cargan al abrir la pantalla: PerfilRepository.miMatricula() → GET
+  //     /perfil/mi-matricula (backend: perfil_routes.py → mi_matricula()). Úsalos con matricula.datos;
+  //     matricula.recargar() vuelve a pedirlos.
   const matricula = useConsulta(() => PerfilRepository.miMatricula(), []);
   if (matricula.cargando || matricula.error || !matricula.datos) return null;
   const m = matricula.datos;
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <>
       <Seccion titulo={`Matrícula ${m.anio}`} />
@@ -125,6 +166,7 @@ function Matricula() {
   );
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   cabecera: { flexDirection: 'row', alignItems: 'center', gap: ESPACIO.md },
   flex: { flex: 1 },

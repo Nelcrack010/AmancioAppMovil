@@ -1,3 +1,13 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: MenuMas: panel que sube desde abajo con las opciones que no caben en la barra, más el botón "Cerrar
+//     sesión".
+//   <MenuMas visible, opciones, pantallaActiva, contadores, alElegir, alCerrar />
+// Lo usan: MenuBar.jsx
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated, Easing, Modal, Platform, Pressable, StyleSheet, View, useWindowDimensions,

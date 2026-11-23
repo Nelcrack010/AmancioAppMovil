@@ -1,3 +1,32 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Aula virtual · Materiales   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: Pestaña "Materiales": archivos y enlaces publicados por el docente. Al tocar un material se abre su
+//     enlace. El docente además puede subir, editar y eliminar.
+// Se muestra dentro de: CursoDetalleView.jsx
+// Desde aquí se va a: Publicar
+//
+// Datos (repositorio → endpoint → backend):
+//   AcademicoRepository.eliminarMaterial() → DELETE /material/item/<int:id_material> (backend:
+//       material_routes.py → eliminar())
+//   AcademicoRepository.materiales() → GET /material/<int:id_carga> (backend: material_routes.py → listar())
+// Botones / secciones: «Publicar material», «Sin materiales»
+// Campos: «Editar material», «Eliminar material»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Pantalla from '../../../components/Pantalla';
@@ -16,6 +45,9 @@ import { COLORES } from '../../../config/tema';
  * Al tocar un material se abre su enlace. El docente además puede subir, editar y eliminar.
  */
 export default function PestanaMateriales({ idCarga, esDocente, navigation }) {
+  // PISTA: «materiales» = datos que se cargan al abrir la pantalla: AcademicoRepository.materiales() → GET
+  //     /material/<int:id_carga> (backend: material_routes.py → listar()). Úsalos con materiales.datos;
+  //     materiales.recargar() vuelve a pedirlos.
   const materiales = useConsulta(() => AcademicoRepository.materiales(idCarga), [idCarga]);
 
   const eliminar = async (m) => {
@@ -28,6 +60,8 @@ export default function PestanaMateriales({ idCarga, esDocente, navigation }) {
     }
   };
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla
       consulta={materiales}
@@ -65,6 +99,7 @@ export default function PestanaMateriales({ idCarga, esDocente, navigation }) {
   );
 }
 
+// PISTA: estilos de esta pantalla. Colores/espacios: src/config/tema.js (COLORES, ESPACIO, RADIO).
 const estilos = StyleSheet.create({
   acciones: { flexDirection: 'row' },
 });

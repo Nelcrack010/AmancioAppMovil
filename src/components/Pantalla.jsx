@@ -1,3 +1,13 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: Pantalla: contenedor estándar de todas las pantallas.
+//   <Pantalla consulta, children, pie, style />
+// Lo usan: MiAsistenciaView.jsx, MiConductaView.jsx, MisCitasView.jsx, MisNotasView.jsx, SolicitarCitaView.jsx,
+//     CambiarPasswordView.jsx, ConductaAlumnoView.jsx, ConductaView.jsx (+26 más)
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React from 'react';
 import { KeyboardAvoidingView, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { AvisoDatosGuardados, Cargando, ErrorVista } from './Estados';

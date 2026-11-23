@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Conexión en TIEMPO REAL con el servidor (WebSocket con Socket.IO).
+// Lo usan: SesionContext.jsx, useChatViewModel.js, useTiempoReal.js
+// <<< FIN GUÍA
 import { io } from 'socket.io-client';
 import { API_CONFIG } from '../config/constants';
 

@@ -1,3 +1,31 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Citas de psicología   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: MisCitasView (estudiante): historial de sus citas de psicología y botón para solicitar una nueva. La
+//     observación del psicólogo es reservada: no se muestra aquí.
+// Pantalla «MisCitas» (src/navigation/pantallas.js): en el menú de ALUMNO («Citas psicología»)
+//     (src/config/menus.js)
+//   Se abre desde: InicioAlumno.jsx  con navigation.navigate('MisCitas', {...})
+// Desde aquí se va a: SolicitarCita
+//
+// Datos (repositorio → endpoint → backend):
+//   ConductaRepository.misCitas() → GET /citas/mis-citas (backend: cita_routes.py → mis_citas())
+// Botones / secciones: «Sin citas», «Solicitar una cita»
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React from 'react';
 import Pantalla from '../../components/Pantalla';
 import Tarjeta from '../../components/Tarjeta';
@@ -17,11 +45,16 @@ import { COLORES } from '../../config/tema';
  * una nueva. La observación del psicólogo es reservada: no se muestra aquí.
  */
 export default function MisCitasView({ navigation }) {
+  // PISTA: «citas» = datos que se cargan al abrir la pantalla: ConductaRepository.misCitas() → GET
+  //     /citas/mis-citas (backend: cita_routes.py → mis_citas()). Úsalos con citas.datos; citas.recargar()
+  //     vuelve a pedirlos.
   const citas = useConsulta(() => ConductaRepository.misCitas(), []);
 
   // Solo se permite una solicitud activa (pendiente o programada) a la vez.
   const tieneActiva = (citas.datos || []).some((c) => c.estado === 'PENDIENTE' || c.estado === 'PROGRAMADA');
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla
       consulta={citas}

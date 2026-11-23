@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: El chat avisa qué conversación se está viendo (null al salir).
+// Lo usan: AvisoPermisoNotificaciones.jsx, SesionContext.jsx, useChatViewModel.js
+// <<< FIN GUÍA
 import { Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';

@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Genera el identificador único de una operación hecha (o que se podría hacer) sin conexión.
+// Lo usan: colaRepository.js
+// <<< FIN GUÍA
 /**
  * Genera el identificador único de una operación hecha (o que se podría hacer) sin conexión.
  *

@@ -1,3 +1,22 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Académico (año y secciones), Asistencia   ·   Capa: VIEWMODEL · lógica de una pantalla (estado,
+//     cargar, guardar) separada del dibujo
+// Qué es: useRegistroAsistenciaViewModel: registro de la asistencia diaria de una sección.
+// Lo usan: RegistrarAsistenciaView.jsx
+//
+// Datos (repositorio → endpoint → backend):
+//   AcademicoRepository.secciones() → GET /academico/secciones (backend: academico_routes.py → secciones())
+//   AsistenciaRepository.alumnosDeSeccion() → GET /asistencia/seccion/<int:id_seccion>/resumen (backend:
+//       asistencia_routes.py → resumen_de_seccion())
+//   AsistenciaRepository.deSeccion() → GET /asistencia/seccion/<int:id_seccion> (backend: asistencia_routes.py →
+//       de_seccion())
+//   AsistenciaRepository.registrarLote() → POST /asistencia/lote (backend: asistencia_routes.py →
+//       registrar_lote()) · sin conexión: queda en cola
+//   CacheRepository.guardarLocal() → solo en el celular
+//
+// Para modificar: lo que la pantalla muestra se lee de lo que devuelve este hook (return { ... } al final).
+//   Un dato o acción nueva → agrégalo aquí y devuélvelo; luego úsalo en la pantalla.
+// <<< FIN GUÍA
 import { useEffect, useMemo, useState } from 'react';
 import useConsulta from './useConsulta';
 import useAccion from './useAccion';
@@ -22,11 +41,16 @@ import { JUSTIFICADA, tocarAsistencia } from '../config/estados';
  * Cada marca es { estado, original }: original es la T o F que se justificó (solo con J).
  */
 export function useRegistroAsistenciaViewModel(idSeccionInicial) {
+  // PISTA: «secciones» = datos que se cargan al abrir la pantalla: AcademicoRepository.secciones() → GET
+  //     /academico/secciones (backend: academico_routes.py → secciones()). Úsalos con secciones.datos;
+  //     secciones.recargar() vuelve a pedirlos.
   const secciones = useConsulta(() => AcademicoRepository.secciones(), []);
   const [idSeccion, setIdSeccion] = useState(idSeccionInicial || null);
   const [fecha, setFecha] = useState(hoyISO());
   const [marcas, setMarcas] = useState({});          // { id_alumno: { estado, original } }
   const [hayCambios, setHayCambios] = useState(false);
+  // PISTA: acción de guardar/enviar: accion.ejecutar(() => Repo.metodo(...)) devuelve { ok, resultado };
+  //     accion.enviando = cargando; accion.error = mensaje de la API.
   const accion = useAccion();
 
   // Si se llega desde el inicio con una sección, usarla; si no, la primera de la lista.
@@ -41,10 +65,12 @@ export function useRegistroAsistenciaViewModel(idSeccionInicial) {
   const listo = Boolean(idSeccion) && fechaValida;
 
   // Estudiantes de la sección y lo ya registrado ese día.
+  // PISTA: datos que se cargan al abrir la pantalla (useConsulta): .datos, .cargando, .error, .recargar().
   const alumnos = useConsulta(
     () => (idSeccion ? AsistenciaRepository.alumnosDeSeccion(idSeccion, hoyISO()) : null),
     [idSeccion],
   );
+  // PISTA: datos que se cargan al abrir la pantalla (useConsulta): .datos, .cargando, .error, .recargar().
   const registrado = useConsulta(
     () => (listo ? AsistenciaRepository.deSeccion(idSeccion, fecha) : null),
     [idSeccion, fecha, listo],

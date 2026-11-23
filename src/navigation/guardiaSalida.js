@@ -1,3 +1,8 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Guardia de salida: avisa si el usuario intenta salir de una pantalla con cambios sin guardar (la
+//     propuesta lo pide para el registro de asistencia).
+// Lo usan: BotonesEncabezado.jsx, MenuBar.jsx, RegistrarAsistenciaView.jsx
+// <<< FIN GUÍA
 import { useEffect } from 'react';
 import { BackHandler } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';

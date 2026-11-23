@@ -1,3 +1,14 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Capa: COMPONENTE · pieza visual reutilizable en varias pantallas
+// Qué es: Etiqueta (badge) de color para mostrar estados: "Pendiente", "Calificada", "Falta"... tono: exito |
+//     alerta | error | info | neutro | guinda
+//   <Etiqueta texto, tono = 'neutro', style />
+// Lo usan: ResumenConducta.jsx, MiAsistenciaView.jsx, MisCitasView.jsx, MisNotasView.jsx,
+//     RegistrarReporteView.jsx, CatalogoFaltasView.jsx, PendientesView.jsx, PerfilView.jsx (+8 más)
+//
+// Para modificar: un cambio aquí se ve en TODAS las pantallas que lo usan.
+//   Si solo quieres cambiar una pantalla, cámbialo en esa pantalla (por ejemplo con una prop o un style).
+// <<< FIN GUÍA
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Texto from './Texto';

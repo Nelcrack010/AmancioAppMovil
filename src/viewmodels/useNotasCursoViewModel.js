@@ -1,3 +1,21 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Académico (año y secciones), Notas   ·   Capa: VIEWMODEL · lógica de una pantalla (estado, cargar,
+//     guardar) separada del dibujo
+// Qué es: useNotasCursoViewModel: registro de notas del docente para un curso.
+// Lo usan: NotasCursoView.jsx
+//
+// Datos (repositorio → endpoint → backend):
+//   AcademicoRepository.anioActivo() → GET /academico/anio-activo (backend: academico_routes.py → anio_activo())
+//   AcademicoRepository.cerrarBimestre() → POST /notas/<int:id_carga>/cerrar-bimestre (backend: nota_routes.py →
+//       cerrar_bimestre())
+//   AcademicoRepository.notasDelCurso() → GET /notas/<int:id_carga> (backend: nota_routes.py →
+//       notas_del_curso())
+//   AcademicoRepository.registrarNotas() → POST /notas/<int:id_carga> (backend: nota_routes.py →
+//       registrar_notas()) · sin conexión: queda en cola
+//
+// Para modificar: lo que la pantalla muestra se lee de lo que devuelve este hook (return { ... } al final).
+//   Un dato o acción nueva → agrégalo aquí y devuélvelo; luego úsalo en la pantalla.
+// <<< FIN GUÍA
 import { useCallback, useEffect, useState } from 'react';
 import useConsulta from './useConsulta';
 import useAccion from './useAccion';
@@ -13,12 +31,18 @@ import { bimestreActual } from '../utils/fechas';
  * bimestre cuando termina; después ya no se puede modificar.
  */
 export function useNotasCursoViewModel(idCarga) {
+  // PISTA: «anio» = datos que se cargan al abrir la pantalla: AcademicoRepository.anioActivo() → GET
+  //     /academico/anio-activo (backend: academico_routes.py → anio_activo()). Úsalos con anio.datos;
+  //     anio.recargar() vuelve a pedirlos.
   const anio = useConsulta(() => AcademicoRepository.anioActivo(), []);
   const [bimestre, setBimestre] = useState(null);
+  // PISTA: datos que se cargan al abrir la pantalla (useConsulta): .datos, .cargando, .error, .recargar().
   const notas = useConsulta(
     () => (bimestre ? AcademicoRepository.notasDelCurso(idCarga, bimestre) : null),
     [idCarga, bimestre],
   );
+  // PISTA: acción de guardar/enviar: accion.ejecutar(() => Repo.metodo(...)) devuelve { ok, resultado };
+  //     accion.enviando = cargando; accion.error = mensaje de la API.
   const accion = useAccion();
 
   const [evaluacion, setEvaluacion] = useState('');

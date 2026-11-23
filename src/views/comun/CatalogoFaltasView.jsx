@@ -1,3 +1,29 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: Conducta   ·   Capa: VISTA (pantalla) · lo que el usuario ve y toca
+// Cadena: [esta vista] → viewmodels/useConsulta·useAccion → repositories/*Repository.js → services/api/*Api.js →
+//     backend
+// Qué es: CatalogoFaltasView: tipos de falta definidos por el colegio, agrupados por gravedad, con los puntos
+//     que descuentan de la nota de conducta (sobre 20).
+// Pantalla «CatalogoFaltas» (src/navigation/pantallas.js): en el menú de AUXILIAR («Catálogo de faltas»),
+//     PSICOLOGO («Faltas»), ADMIN («Faltas») (src/config/menus.js)
+//   Se abre desde: InicioAdmin.jsx  con navigation.navigate('CatalogoFaltas', {...})
+//
+// Datos (repositorio → endpoint → backend):
+//   ConductaRepository.faltas() → GET /conducta/faltas (backend: conducta_routes.py → faltas())
+//
+// Para modificar:
+//   • Texto, etiqueta o botón → búscalo aquí abajo (Ctrl+F) y cámbialo.
+//   • Mostrar un campo nuevo → primero que venga en el JSON (SELECT del repository del backend), luego aquí:
+//     {x.campo && <Texto variante="pequeno">Campo: {x.campo}</Texto>}
+//   • Campo de formulario → const [valor, setValor] = useState(''); <Campo etiqueta="..." valor={valor}
+//       alCambiar={setValor} />
+//     y agrégalo al objeto que se envía en accion.ejecutar(...).
+//   • Regla local → validarTexto/validarEnlace dentro de primerError(...) (src/utils/validaciones.js). Pon la
+//       misma regla en el service.
+//   • Botón → <Boton titulo="..." variante="primario|guinda|secundario|peligro|texto" pequeno onPress={() =>
+//       ...} />
+//   • Ir a otra pantalla → navigation.navigate('Nombre', { id }). Pantalla nueva: src/navigation/pantallas.js.
+// <<< FIN GUÍA
 import React from 'react';
 import { View } from 'react-native';
 import Pantalla from '../../components/Pantalla';
@@ -14,8 +40,13 @@ import { TIPOS_FALTA } from '../../config/estados';
  * con los puntos que descuentan de la nota de conducta (sobre 20).
  */
 export default function CatalogoFaltasView() {
+  // PISTA: «faltas» = datos que se cargan al abrir la pantalla: ConductaRepository.faltas() → GET
+  //     /conducta/faltas (backend: conducta_routes.py → faltas()). Úsalos con faltas.datos; faltas.recargar()
+  //     vuelve a pedirlos.
   const faltas = useConsulta(() => ConductaRepository.faltas(), []);
 
+  // PISTA: desde aquí, lo que se dibuja (JSX). Para comentar dentro del JSX usa {/* ... */}. Mostrar algo solo
+  //     si existe: {dato && <Texto>...</Texto>}.
   return (
     <Pantalla consulta={faltas}>
       {(lista) => {

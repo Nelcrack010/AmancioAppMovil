@@ -1,3 +1,11 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Configuración global de la aplicación.
+// Lo usan: ConexionContext.jsx, SesionContext.jsx, mensajesRepository.js, sesionRepository.js, apiClient.js,
+//     archivos.js, servidor.js, tiempoRealService.js (+1 más)
+//
+// Para modificar:
+//   Dirección del servidor (API) y otros valores fijos.
+// <<< FIN GUÍA
 /**
  * Configuración global de la aplicación.
  *

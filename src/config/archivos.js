@@ -1,3 +1,7 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Qué es: Archivos que se pueden subir (enunciado de una tarea y entregas de los alumnos).
+// Lo usan: Archivos.jsx, archivos.js
+// <<< FIN GUÍA
 /**
  * Archivos que se pueden subir (enunciado de una tarea y entregas de los alumnos).
  *

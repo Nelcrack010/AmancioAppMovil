@@ -1,3 +1,11 @@
+// >>> GUÍA DEL ARCHIVO (comentarios de estudio: busca «PISTA:» para ver las pistas)
+// Módulo: general   ·   Capa: VIEWMODEL · lógica de una pantalla (estado, cargar, guardar) separada del dibujo
+// Qué es: useTiempoReal: ejecuta `funcion` para mantener una pantalla al día.
+// Lo usan: SesionContext.jsx, useChatViewModel.js, useConsulta.js
+//
+// Para modificar: lo que la pantalla muestra se lee de lo que devuelve este hook (return { ... } al final).
+//   Un dato o acción nueva → agrégalo aquí y devuélvelo; luego úsalo en la pantalla.
+// <<< FIN GUÍA
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
