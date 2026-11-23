@@ -17,7 +17,7 @@
  *     sin volver a compilar (ver src/services/servidor.js).
  */
 export const API_CONFIG = {
-  BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'https://146.181.54.237',
+  BASE_URL: 'http://10.136.126.182:5000',
   TIMEOUT_MS: 15000,
   TIMEOUT_ARCHIVOS_MS: 90000,   // subir un archivo puede tardar más (datos móviles)
   HEADERS: {
