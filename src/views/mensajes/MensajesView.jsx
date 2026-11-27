@@ -40,6 +40,29 @@ import { formatearFecha, hoyISO, soloHora } from '../../utils/fechas';
 import { NOMBRES_ROL } from '../../config/estados';
 import { TIEMPO_REAL } from '../../config/tiempoReal';
 import { COLORES, ESPACIO, RADIO } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Tarjeta from '../../components/Tarjeta';
+import Campo from '../../components/Campo';
+import Etiqueta from '../../components/Etiqueta';
+import Selector from '../../components/Selector';
+import DialogoTexto from '../../components/DialogoTexto';
+import { Seccion, Fila, FilaDatos, Dato, Separador } from '../../components/Basicos';
+import { Aviso, Cargando } from '../../components/Estados';
+import useAccion from '../../viewmodels/useAccion';
+import AcademicoRepository from '../../repositories/academicoRepository';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import ConductaRepository from '../../repositories/conductaRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { useSesion } from '../../context/SesionContext';
+import { confirmar, avisar, avisarResultado } from '../../utils/dialogos';
+import { validarTexto, validarEnlace, primerError } from '../../utils/validaciones';
+import { formatearFechaHora, esFechaValida, sumarDias } from '../../utils/fechas';
+import { infoEstado, ESTADOS_CITA, ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+import { SOMBRA } from '../../config/tema';
+// <<< FIN KIT DE IMPORTS
 
 /**
  * MensajesView: conversaciones del usuario con el último mensaje y los no leídos.

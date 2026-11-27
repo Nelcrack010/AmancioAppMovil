@@ -37,6 +37,26 @@ import ConductaRepository from '../../repositories/conductaRepository';
 import { formatearFecha, hoyISO, nombreDia, soloHora, sumarDias } from '../../utils/fechas';
 import { ESTADOS_CITA, infoEstado } from '../../config/estados';
 import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useEffect, useCallback, useMemo } from 'react';
+import Tarjeta from '../../components/Tarjeta';
+import Boton from '../../components/Boton';
+import Campo from '../../components/Campo';
+import Selector from '../../components/Selector';
+import DialogoTexto from '../../components/DialogoTexto';
+import { Fila, FilaDatos, Dato, Separador } from '../../components/Basicos';
+import { Aviso, Vacio, Cargando } from '../../components/Estados';
+import useAccion from '../../viewmodels/useAccion';
+import AcademicoRepository from '../../repositories/academicoRepository';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import MensajesRepository from '../../repositories/mensajesRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { useSesion } from '../../context/SesionContext';
+import { confirmar, avisar, avisarResultado } from '../../utils/dialogos';
+import { validarTexto, validarEnlace, primerError } from '../../utils/validaciones';
+import { formatearFechaHora, esFechaValida } from '../../utils/fechas';
+import { ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+// <<< FIN KIT DE IMPORTS
 
 /**
  * AgendaView (psicólogo): citas de un día (por defecto hoy) y las solicitudes que aún

@@ -52,6 +52,26 @@ import {
 } from '../../utils/fechas';
 import { ESTADOS_CITA, infoEstado } from '../../config/estados';
 import { ESPACIO } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useEffect, useCallback, useMemo } from 'react';
+import { Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Selector from '../../components/Selector';
+import Lista from '../../components/Lista';
+import { ItemLista } from '../../components/Lista';
+import { FilaDatos, Dato, Separador } from '../../components/Basicos';
+import { Vacio, Cargando } from '../../components/Estados';
+import useConsulta from '../../viewmodels/useConsulta';
+import AcademicoRepository from '../../repositories/academicoRepository';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import MensajesRepository from '../../repositories/mensajesRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { useSesion } from '../../context/SesionContext';
+import { confirmar, avisarResultado } from '../../utils/dialogos';
+import { validarTexto, validarEnlace, primerError } from '../../utils/validaciones';
+import { ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+import { COLORES, RADIO, SOMBRA } from '../../config/tema';
+// <<< FIN KIT DE IMPORTS
 
 /**
  * CitaDetalleView (psicólogo): gestiona una cita.

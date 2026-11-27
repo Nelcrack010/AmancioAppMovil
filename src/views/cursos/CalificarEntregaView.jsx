@@ -43,6 +43,29 @@ import AcademicoRepository from '../../repositories/academicoRepository';
 import { avisar } from '../../utils/dialogos';
 import { formatearFechaHora } from '../../utils/fechas';
 import { aNumero, primerError, validarNota, validarTexto } from '../../utils/validaciones';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useEffect, useCallback, useMemo } from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Etiqueta from '../../components/Etiqueta';
+import Selector from '../../components/Selector';
+import DialogoTexto from '../../components/DialogoTexto';
+import Lista from '../../components/Lista';
+import { ItemLista } from '../../components/Lista';
+import { Seccion, FilaDatos, Dato, Separador } from '../../components/Basicos';
+import { Vacio, Cargando } from '../../components/Estados';
+import useConsulta from '../../viewmodels/useConsulta';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import ConductaRepository from '../../repositories/conductaRepository';
+import MensajesRepository from '../../repositories/mensajesRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { useSesion } from '../../context/SesionContext';
+import { confirmar, avisarResultado } from '../../utils/dialogos';
+import { validarEnlace } from '../../utils/validaciones';
+import { formatearFecha, hoyISO, esFechaValida, sumarDias } from '../../utils/fechas';
+import { infoEstado, ESTADOS_CITA, ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
+// <<< FIN KIT DE IMPORTS
 
 /**
  * CalificarEntregaView (docente): pone la nota (0 a 20) y una observación a una entrega.

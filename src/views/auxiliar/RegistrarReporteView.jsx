@@ -49,6 +49,23 @@ import { esFechaValida, hoyISO } from '../../utils/fechas';
 import { primerError, validarEnlace, validarTexto } from '../../utils/validaciones';
 import { TIPOS_FALTA } from '../../config/estados';
 import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useEffect, useCallback, useMemo } from 'react';
+import Selector from '../../components/Selector';
+import DialogoTexto from '../../components/DialogoTexto';
+import Lista from '../../components/Lista';
+import { ItemLista } from '../../components/Lista';
+import { Fila, FilaDatos, Dato, Separador } from '../../components/Basicos';
+import { Vacio, Cargando } from '../../components/Estados';
+import AcademicoRepository from '../../repositories/academicoRepository';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import MensajesRepository from '../../repositories/mensajesRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { useSesion } from '../../context/SesionContext';
+import { confirmar, avisar } from '../../utils/dialogos';
+import { formatearFecha, formatearFechaHora, sumarDias } from '../../utils/fechas';
+import { infoEstado, ESTADOS_CITA, ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+// <<< FIN KIT DE IMPORTS
 
 /**
  * RegistrarReporteView (auxiliar): registra un reporte (parte) de conducta: tipo de falta,

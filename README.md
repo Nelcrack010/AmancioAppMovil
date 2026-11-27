@@ -497,7 +497,8 @@ Pantalla (views) → ViewModel (viewmodels) → Repositorio (repositories) → S
 | Errores | `app/errors.py` (`ApiError(status, "mensaje")` → `{"detail": ...}`) | `src/services/api/apiClient.js` (lee `detail`) · `<Aviso tono="error">` |
 | Token y roles | `app/auth.py` (`@jwt_required`, `usuario_actual()`) | `src/context/SesionContext.jsx` (`useSesion()` → `usuario.rol`) |
 | SQL | `app/database.py` (`consultar_uno`, `consultar_todos`, `insertar`, `ejecutar`) | — |
-| Columnas nuevas | `database/schema.sql` + `app/migraciones.py` (`COLUMNAS_NUEVAS`) | — |
+| Columnas nuevas | `database/schema.sql` + `app/migraciones.py` (`COLUMNAS_NUEVAS`; con PostgreSQL se adapta sola) | — |
+| MySQL o PostgreSQL | `.env` (`DB_MOTOR`) y `app/database.py` (conexión y traducción del SQL) | — |
 | Registrar un módulo nuevo | `app/__init__.py` (`register_blueprint`) | `src/navigation/pantallas.js` + `src/config/menus.js` |
 | Fechas | `app/utils.py` (`fecha`, `fecha_hora`) | `src/utils/fechas.js` (`formatearFecha`, `hoyISO`) |
 | Confirmar / avisar | — | `src/utils/dialogos.js` (`confirmar`, `avisar`) |

@@ -47,6 +47,26 @@ import { formatearFechaHora } from '../../utils/fechas';
 import { primerError, validarEnlace, validarTexto } from '../../utils/validaciones';
 import { ESTADOS_TAREA, infoEstado } from '../../config/estados';
 import { COLORES } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useEffect, useCallback, useMemo } from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Selector from '../../components/Selector';
+import DialogoTexto from '../../components/DialogoTexto';
+import Lista from '../../components/Lista';
+import { ItemLista } from '../../components/Lista';
+import { FilaDatos, Dato, Separador } from '../../components/Basicos';
+import { Vacio, Cargando } from '../../components/Estados';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import ConductaRepository from '../../repositories/conductaRepository';
+import MensajesRepository from '../../repositories/mensajesRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { useSesion } from '../../context/SesionContext';
+import { confirmar, avisar } from '../../utils/dialogos';
+import { formatearFecha, hoyISO, esFechaValida, sumarDias } from '../../utils/fechas';
+import { ESTADOS_CITA, ESTADOS_REPORTE } from '../../config/estados';
+import { ESPACIO, RADIO, SOMBRA } from '../../config/tema';
+// <<< FIN KIT DE IMPORTS
 
 /**
  * Contenido principal de la tarea una vez que sus datos están cargados.

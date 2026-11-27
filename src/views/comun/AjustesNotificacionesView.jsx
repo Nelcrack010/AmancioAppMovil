@@ -50,6 +50,26 @@ import { avisar } from '../../utils/dialogos';
 import { esHoraValida, formatearFechaHora } from '../../utils/fechas';
 import { HORARIO_NO_MOLESTAR_SUGERIDO } from '../../config/notificaciones';
 import { COLORES, ESPACIO } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useCallback, useMemo } from 'react';
+import { Pressable } from 'react-native';
+import Etiqueta from '../../components/Etiqueta';
+import DialogoTexto from '../../components/DialogoTexto';
+import Lista from '../../components/Lista';
+import { ItemLista } from '../../components/Lista';
+import { Fila, FilaDatos, Dato, Separador } from '../../components/Basicos';
+import { Vacio, Cargando } from '../../components/Estados';
+import AcademicoRepository from '../../repositories/academicoRepository';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import ConductaRepository from '../../repositories/conductaRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { useSesion } from '../../context/SesionContext';
+import { confirmar, avisarResultado } from '../../utils/dialogos';
+import { validarTexto, validarEnlace, primerError } from '../../utils/validaciones';
+import { formatearFecha, hoyISO, esFechaValida, sumarDias } from '../../utils/fechas';
+import { infoEstado, ESTADOS_CITA, ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+import { RADIO, SOMBRA } from '../../config/tema';
+// <<< FIN KIT DE IMPORTS
 
 /**
  * AjustesNotificacionesView: silenciar o limitar las notificaciones PUSH (las que llegan

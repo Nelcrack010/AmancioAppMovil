@@ -40,6 +40,28 @@ import AcademicoRepository from '../../repositories/academicoRepository';
 import { bimestreActual } from '../../utils/fechas';
 import { colorNota } from '../../config/estados';
 import { COLORES, ESPACIO } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useCallback, useMemo } from 'react';
+import { Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Boton from '../../components/Boton';
+import Campo from '../../components/Campo';
+import DialogoTexto from '../../components/DialogoTexto';
+import Lista from '../../components/Lista';
+import { ItemLista } from '../../components/Lista';
+import { Seccion, FilaDatos, Dato, Separador } from '../../components/Basicos';
+import useAccion from '../../viewmodels/useAccion';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import ConductaRepository from '../../repositories/conductaRepository';
+import MensajesRepository from '../../repositories/mensajesRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { useSesion } from '../../context/SesionContext';
+import { confirmar, avisar, avisarResultado } from '../../utils/dialogos';
+import { validarTexto, validarEnlace, primerError } from '../../utils/validaciones';
+import { formatearFecha, formatearFechaHora, hoyISO, esFechaValida, sumarDias } from '../../utils/fechas';
+import { infoEstado, ESTADOS_CITA, ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+import { RADIO, SOMBRA } from '../../config/tema';
+// <<< FIN KIT DE IMPORTS
 
 const LIBRETA = 'LIBRETA';
 const OPCIONES = [

@@ -33,6 +33,31 @@ import PestanaMateriales from './pestanas/PestanaMateriales';
 import PestanaClases from './pestanas/PestanaClases';
 import PestanaAlumnos from './pestanas/PestanaAlumnos';
 import { COLORES, ESPACIO, RADIO } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useEffect, useCallback, useMemo } from 'react';
+import Pantalla from '../../components/Pantalla';
+import Tarjeta from '../../components/Tarjeta';
+import Boton from '../../components/Boton';
+import Campo from '../../components/Campo';
+import Etiqueta from '../../components/Etiqueta';
+import DialogoTexto from '../../components/DialogoTexto';
+import Lista from '../../components/Lista';
+import { ItemLista } from '../../components/Lista';
+import { Seccion, Fila, FilaDatos, Dato, Separador } from '../../components/Basicos';
+import { Aviso, Vacio, Cargando } from '../../components/Estados';
+import useConsulta from '../../viewmodels/useConsulta';
+import useAccion from '../../viewmodels/useAccion';
+import AcademicoRepository from '../../repositories/academicoRepository';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import ConductaRepository from '../../repositories/conductaRepository';
+import MensajesRepository from '../../repositories/mensajesRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { confirmar, avisar, avisarResultado } from '../../utils/dialogos';
+import { validarTexto, validarEnlace, primerError } from '../../utils/validaciones';
+import { formatearFecha, formatearFechaHora, hoyISO, esFechaValida, sumarDias } from '../../utils/fechas';
+import { infoEstado, ESTADOS_CITA, ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+import { SOMBRA } from '../../config/tema';
+// <<< FIN KIT DE IMPORTS
 
 /**
  * CursoDetalleView: aula virtual de un curso, organizada en pestañas.

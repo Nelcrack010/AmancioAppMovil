@@ -39,6 +39,28 @@ import { avisarResultado, confirmar } from '../../utils/dialogos';
 import { formatearFecha, hoyISO, nombreDia, sumarDias } from '../../utils/fechas';
 import { ESTADOS_ASISTENCIA, botonAsistenciaActivo } from '../../config/estados';
 import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import Tarjeta from '../../components/Tarjeta';
+import Campo from '../../components/Campo';
+import Etiqueta from '../../components/Etiqueta';
+import DialogoTexto from '../../components/DialogoTexto';
+import Lista from '../../components/Lista';
+import { ItemLista } from '../../components/Lista';
+import { Fila, FilaDatos, Dato, Separador } from '../../components/Basicos';
+import useConsulta from '../../viewmodels/useConsulta';
+import useAccion from '../../viewmodels/useAccion';
+import AcademicoRepository from '../../repositories/academicoRepository';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import ConductaRepository from '../../repositories/conductaRepository';
+import MensajesRepository from '../../repositories/mensajesRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { useSesion } from '../../context/SesionContext';
+import { avisar } from '../../utils/dialogos';
+import { validarTexto, validarEnlace, primerError } from '../../utils/validaciones';
+import { formatearFechaHora, esFechaValida } from '../../utils/fechas';
+import { infoEstado, ESTADOS_CITA, ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+// <<< FIN KIT DE IMPORTS
 
 const ESTADOS = ['P', 'T', 'F', 'J'];
 const COLOR_ESTADO = { P: COLORES.exito, T: COLORES.alerta, F: COLORES.error, J: COLORES.azul };

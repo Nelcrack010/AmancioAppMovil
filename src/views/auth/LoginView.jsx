@@ -39,6 +39,27 @@ import {
 import { validarTexto, primerError } from '../../utils/validaciones';
 import { NOMBRE_APP } from '../../config/constants';
 import { COLORES, ESPACIO, RADIO, SOMBRA } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useCallback, useMemo } from 'react';
+import Pantalla from '../../components/Pantalla';
+import Tarjeta from '../../components/Tarjeta';
+import Etiqueta from '../../components/Etiqueta';
+import Selector from '../../components/Selector';
+import Lista from '../../components/Lista';
+import { ItemLista } from '../../components/Lista';
+import { Seccion, Fila, FilaDatos, Dato, Separador } from '../../components/Basicos';
+import { Vacio, Cargando } from '../../components/Estados';
+import useConsulta from '../../viewmodels/useConsulta';
+import AcademicoRepository from '../../repositories/academicoRepository';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import ConductaRepository from '../../repositories/conductaRepository';
+import MensajesRepository from '../../repositories/mensajesRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { confirmar, avisar, avisarResultado } from '../../utils/dialogos';
+import { validarEnlace } from '../../utils/validaciones';
+import { formatearFecha, formatearFechaHora, hoyISO, esFechaValida, sumarDias } from '../../utils/fechas';
+import { infoEstado, ESTADOS_CITA, ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+// <<< FIN KIT DE IMPORTS
 
 /**
  * LoginView: inicio de sesión con usuario y contraseña.

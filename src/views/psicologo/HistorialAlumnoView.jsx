@@ -39,6 +39,30 @@ import ConductaRepository from '../../repositories/conductaRepository';
 import { formatearFecha, formatearFechaHora } from '../../utils/fechas';
 import { ESTADOS_CITA, infoEstado } from '../../config/estados';
 import { COLORES } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Boton from '../../components/Boton';
+import Campo from '../../components/Campo';
+import Selector from '../../components/Selector';
+import DialogoTexto from '../../components/DialogoTexto';
+import Lista from '../../components/Lista';
+import { ItemLista } from '../../components/Lista';
+import { Seccion, Separador } from '../../components/Basicos';
+import { Cargando } from '../../components/Estados';
+import useAccion from '../../viewmodels/useAccion';
+import AcademicoRepository from '../../repositories/academicoRepository';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import MensajesRepository from '../../repositories/mensajesRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { useSesion } from '../../context/SesionContext';
+import { confirmar, avisar, avisarResultado } from '../../utils/dialogos';
+import { validarTexto, validarEnlace, primerError } from '../../utils/validaciones';
+import { hoyISO, esFechaValida, sumarDias } from '../../utils/fechas';
+import { ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+import { ESPACIO, RADIO, SOMBRA } from '../../config/tema';
+// <<< FIN KIT DE IMPORTS
 
 /**
  * HistorialAlumnoView (psicólogo): todas las citas de un estudiante con las

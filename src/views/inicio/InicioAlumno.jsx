@@ -32,6 +32,32 @@ import { BloqueHorario, FilaClaseVirtual } from '../../components/Items';
 import { formatearFechaHora } from '../../utils/fechas';
 import { ESTADOS_CITA, colorNota, infoEstado } from '../../config/estados';
 import { COLORES } from '../../config/tema';
+// >>> KIT DE IMPORTS (para el examen): lo que una pantalla suele necesitar. Si no se usa, no pasa nada.
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import Pantalla from '../../components/Pantalla';
+import Tarjeta from '../../components/Tarjeta';
+import Boton from '../../components/Boton';
+import Campo from '../../components/Campo';
+import Selector from '../../components/Selector';
+import DialogoTexto from '../../components/DialogoTexto';
+import { Fila, Separador } from '../../components/Basicos';
+import { Vacio, Cargando } from '../../components/Estados';
+import useConsulta from '../../viewmodels/useConsulta';
+import useAccion from '../../viewmodels/useAccion';
+import AcademicoRepository from '../../repositories/academicoRepository';
+import AsistenciaRepository from '../../repositories/asistenciaRepository';
+import ConductaRepository from '../../repositories/conductaRepository';
+import MensajesRepository from '../../repositories/mensajesRepository';
+import PerfilRepository from '../../repositories/perfilRepository';
+import { useSesion } from '../../context/SesionContext';
+import { confirmar, avisar, avisarResultado } from '../../utils/dialogos';
+import { validarTexto, validarEnlace, primerError } from '../../utils/validaciones';
+import { formatearFecha, hoyISO, esFechaValida, sumarDias } from '../../utils/fechas';
+import { ESTADOS_TAREA, ESTADOS_REPORTE } from '../../config/estados';
+import { ESPACIO, RADIO, SOMBRA } from '../../config/tema';
+// <<< FIN KIT DE IMPORTS
 
 /**
  * Panel del estudiante: resumen del año (conducta, asistencia), próximas tareas,
